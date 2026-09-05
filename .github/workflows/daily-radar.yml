@@ -27,7 +27,7 @@ jobs:
       - name: Run radar
         run: python radar.py
 
-            - name: Save results
+      - name: Save results
         run: |
           git config user.name "future-stock-radar[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
