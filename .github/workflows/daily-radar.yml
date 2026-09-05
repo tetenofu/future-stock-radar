@@ -27,10 +27,21 @@ jobs:
       - name: Run radar
         run: python radar.py
 
-      - name: Save results
+            - name: Save results
         run: |
           git config user.name "future-stock-radar[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add data/
-          git diff --cached --quiet || git commit -m "Update daily radar"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "No changes to save."
+            exit 0
+          fi
+
+          git commit -m "Update daily radar"
+
+          git fetch origin main
+          git rebase origin/main
+
+          git push origin HEAD:main
