@@ -4,195 +4,466 @@ import csv
 import os
 from datetime import datetime, timezone
 
-# ==========================================
-# Future Stock Radar
-# 無料テンバガー早期発見システム
-# ==========================================
+# ============================================================
+# Future Stock Radar v2
+# 「テーマ」→「企業」→「材料の強さ」を自動判定
+# ============================================================
 
-KEYWORDS = {
+RSS_FEEDS = {
     "AIデータセンター": [
-        "AI data center",
-        "AI infrastructure",
-        "data center power",
-        "data center cooling"
+        "https://news.google.com/rss/search?q=AI+data+center",
+        "https://news.google.com/rss/search?q=data+center+power",
+        "https://news.google.com/rss/search?q=data+center+cooling",
     ],
+
     "光通信": [
-        "co-packaged optics",
-        "CPO",
-        "silicon photonics",
-        "optical interconnect",
-        "optical I/O"
+        "https://news.google.com/rss/search?q=co-packaged+optics",
+        "https://news.google.com/rss/search?q=silicon+photonics",
+        "https://news.google.com/rss/search?q=optical+I/O",
+        "https://news.google.com/rss/search?q=optical+interconnect",
     ],
+
     "冷却・熱管理": [
-        "liquid cooling",
-        "immersion cooling",
-        "thermal management",
-        "heat exchanger",
-        "radiator"
+        "https://news.google.com/rss/search?q=liquid+cooling+data+center",
+        "https://news.google.com/rss/search?q=immersion+cooling",
+        "https://news.google.com/rss/search?q=thermal+management+data+center",
+        "https://news.google.com/rss/search?q=heat+exchanger+data+center",
     ],
+
     "電力・蓄電": [
-        "data center electricity",
-        "data center power",
-        "grid",
-        "energy storage",
-        "fuel cell"
+        "https://news.google.com/rss/search?q=data+center+electricity",
+        "https://news.google.com/rss/search?q=data+center+power+grid",
+        "https://news.google.com/rss/search?q=energy+storage+data+center",
+        "https://news.google.com/rss/search?q=fuel+cell+data+center",
     ],
+
     "半導体": [
-        "advanced packaging",
-        "chiplet",
-        "HBM",
-        "compound semiconductor",
-        "GaN",
-        "SiC"
+        "https://news.google.com/rss/search?q=advanced+packaging+semiconductor",
+        "https://news.google.com/rss/search?q=chiplet",
+        "https://news.google.com/rss/search?q=HBM",
+        "https://news.google.com/rss/search?q=compound+semiconductor",
+        "https://news.google.com/rss/search?q=GaN+semiconductor",
+        "https://news.google.com/rss/search?q=SiC+semiconductor",
     ],
+
     "宇宙": [
-        "space data center",
-        "orbital data center",
-        "satellite computing",
-        "space optical communication",
-        "inter-satellite laser"
+        "https://news.google.com/rss/search?q=space+data+center",
+        "https://news.google.com/rss/search?q=orbital+data+center",
+        "https://news.google.com/rss/search?q=satellite+computing",
+        "https://news.google.com/rss/search?q=space+optical+communication",
+        "https://news.google.com/rss/search?q=inter-satellite+laser",
     ],
+
     "宇宙熱管理": [
-        "space radiator",
-        "spacecraft thermal",
-        "space thermal management",
-        "heat rejection"
-    ]
+        "https://news.google.com/rss/search?q=space+radiator",
+        "https://news.google.com/rss/search?q=spacecraft+thermal+management",
+        "https://news.google.com/rss/search?q=heat+rejection+spacecraft",
+    ],
+
+    "宇宙太陽光・発電": [
+        "https://news.google.com/rss/search?q=space+solar+power",
+        "https://news.google.com/rss/search?q=space+solar+panel",
+        "https://news.google.com/rss/search?q=space+energy",
+    ],
 }
 
-RSS_URLS = [
-    "https://news.google.com/rss/search?q=AI+data+center",
-    "https://news.google.com/rss/search?q=co-packaged+optics",
-    "https://news.google.com/rss/search?q=silicon+photonics",
-    "https://news.google.com/rss/search?q=liquid+cooling+data+center",
-    "https://news.google.com/rss/search?q=space+data+center",
-    "https://news.google.com/rss/search?q=space+optical+communication",
-    "https://news.google.com/rss/search?q=advanced+packaging+semiconductor"
+
+# ============================================================
+# 材料判定キーワード
+# ============================================================
+
+MATERIALS = {
+    "大型受注": {
+        "keywords": [
+            "order", "orders", "purchase order",
+            "follow-on order", "contract",
+            "受注", "大型受注", "契約"
+        ],
+        "score": 30
+    },
+
+    "量産・生産開始": {
+        "keywords": [
+            "production", "mass production",
+            "volume production", "manufacturing",
+            "量産", "生産開始"
+        ],
+        "score": 25
+    },
+
+    "大企業との提携": {
+        "keywords": [
+            "partnership", "partner", "strategic partnership",
+            "collaboration", "alliance",
+            "提携", "協業", "共同開発"
+        ],
+        "score": 25
+    },
+
+    "戦略的投資": {
+        "keywords": [
+            "investment", "strategic investment",
+            "invests", "funding",
+            "投資", "出資"
+        ],
+        "score": 22
+    },
+
+    "政府支援": {
+        "keywords": [
+            "government", "subsidy", "grant",
+            "funded by", "government funding",
+            "政府", "補助金", "助成金"
+        ],
+        "score": 20
+    },
+
+    "特許・技術": {
+        "keywords": [
+            "patent", "patented", "intellectual property",
+            "breakthrough", "new technology",
+            "特許", "新技術", "技術革新"
+        ],
+        "score": 15
+    },
+
+    "研究開発": {
+        "keywords": [
+            "research", "development", "R&D",
+            "demonstration", "prototype",
+            "研究", "開発", "実証", "試作"
+        ],
+        "score": 12
+    },
+
+    "設備投資": {
+        "keywords": [
+            "capital expenditure", "capex",
+            "factory expansion", "facility expansion",
+            "new facility", "設備投資", "工場増設"
+        ],
+        "score": 18
+    },
+
+    "業績上方修正": {
+        "keywords": [
+            "raises outlook", "raised guidance",
+            "upgrade guidance", "higher revenue",
+            "record revenue", "record sales",
+            "上方修正", "最高益", "増収"
+        ],
+        "score": 30
+    },
+}
+
+
+# ============================================================
+# 企業名抽出用のパターン
+# ============================================================
+
+# 「会社名 + Corporation / Inc. / Systems」など
+COMPANY_PATTERNS = [
+    r"\b[A-Z][A-Za-z0-9&.\- ]{1,40}\s+(?:Inc\.|Corp\.|Corporation|Ltd\.|Limited|PLC|Systems|Technologies|Technology|Industries)\b",
+
+    # 「Company」が付くケース
+    r"\b[A-Z][A-Za-z0-9&.\- ]{1,40}\s+Company\b",
 ]
 
 
-def normalize(text):
-    return re.sub(r"\s+", " ", text).strip()
+# ============================================================
+# テーマ判定
+# ============================================================
+
+def detect_theme(text):
+    text_lower = text.lower()
+
+    for theme, feeds in RSS_FEEDS.items():
+
+        keywords = {
+            "AIデータセンター": [
+                "ai data center",
+                "data center",
+                "hyperscale"
+            ],
+
+            "光通信": [
+                "co-packaged optics",
+                "silicon photonics",
+                "optical i/o",
+                "optical interconnect"
+            ],
+
+            "冷却・熱管理": [
+                "liquid cooling",
+                "immersion cooling",
+                "thermal management",
+                "heat exchanger"
+            ],
+
+            "電力・蓄電": [
+                "data center power",
+                "data center electricity",
+                "energy storage",
+                "fuel cell",
+                "grid"
+            ],
+
+            "半導体": [
+                "advanced packaging",
+                "chiplet",
+                "hbm",
+                "compound semiconductor",
+                "gan",
+                "sic"
+            ],
+
+            "宇宙": [
+                "space data center",
+                "orbital data center",
+                "satellite computing",
+                "space optical communication",
+                "inter-satellite laser"
+            ],
+
+            "宇宙熱管理": [
+                "space radiator",
+                "spacecraft thermal",
+                "heat rejection"
+            ],
+
+            "宇宙太陽光・発電": [
+                "space solar power",
+                "space solar panel",
+                "space energy"
+            ]
+        }
+
+        for keyword in keywords.get(theme, []):
+            if keyword in text_lower:
+                return theme
+
+    return "その他"
 
 
-def detect_themes(title, summary):
-    text = normalize((title + " " + summary).lower())
-    themes = []
+# ============================================================
+# 材料判定
+# ============================================================
 
-    for theme, words in KEYWORDS.items():
-        for word in words:
-            if word.lower() in text:
-                themes.append(theme)
+def detect_material(text):
+
+    text_lower = text.lower()
+
+    found = []
+    score = 0
+
+    for material, data in MATERIALS.items():
+
+        for keyword in data["keywords"]:
+
+            if keyword.lower() in text_lower:
+
+                found.append(material)
+                score += data["score"]
                 break
 
-    return list(dict.fromkeys(themes))
+    # 重複による過剰評価を防止
+    score = min(score, 100)
+
+    if not found:
+        found = ["テーマ関連ニュース"]
+
+    return " / ".join(found), score
 
 
-def score_article(title, summary, themes):
-    text = (title + " " + summary).lower()
-    score = 0
-    reasons = []
+# ============================================================
+# 企業名抽出
+# ============================================================
 
-    # 技術テーマ
-    if themes:
-        score += 10
-        reasons.append("注目技術")
+def extract_companies(text):
 
-    # 大企業・政府・研究などのシグナル
-    signals = {
-        "partnership": [
-            "partnership", "partner", "collaboration",
-            "agreement", "alliance"
-        ],
-        "investment": [
-            "investment", "funding", "invest",
-            "capital expenditure", "capex"
-        ],
-        "order": [
-            "order", "contract", "purchase",
-            "customer", "deployment"
-        ],
-        "government": [
-            "government", "department", "ministry",
-            "subsidy", "grant", "program"
-        ],
-        "research": [
-            "research", "university", "laboratory",
-            "prototype", "demonstration"
-        ],
-        "patent": [
-            "patent", "intellectual property"
-        ]
-    }
+    companies = []
 
-    weights = {
-        "partnership": 15,
-        "investment": 10,
-        "order": 20,
-        "government": 15,
-        "research": 10,
-        "patent": 10
-    }
+    for pattern in COMPANY_PATTERNS:
 
-    for signal, words in signals.items():
-        if any(word in text for word in words):
-            score += weights[signal]
-            reasons.append(signal)
+        matches = re.findall(pattern, text)
 
-    return min(score, 100), ", ".join(reasons)
+        for match in matches:
+
+            company = " ".join(match.split())
+
+            if company not in companies:
+                companies.append(company)
+
+    # ノイズになりやすい一般語を除外
+    blacklist = [
+        "Data Center Company",
+        "Technology Company",
+        "Research Company",
+        "Energy Company",
+        "Semiconductor Company",
+    ]
+
+    companies = [
+        c for c in companies
+        if c not in blacklist
+    ]
+
+    return companies[:5]
 
 
-def main():
+# ============================================================
+# 重要度判定
+# ============================================================
 
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+def importance_level(score):
+
+    if score >= 70:
+        return "🔥 最重要"
+
+    if score >= 50:
+        return "🟠 重要"
+
+    if score >= 30:
+        return "🟡 注目"
+
+    return "⚪ 情報"
+
+
+# ============================================================
+# RSS取得
+# ============================================================
+
+def collect_news():
 
     results = []
 
-    for rss_url in RSS_URLS:
+    for theme, feeds in RSS_FEEDS.items():
 
-        try:
-            feed = feedparser.parse(rss_url)
+        for url in feeds:
 
-            for entry in feed.entries[:20]:
+            try:
 
-                title = normalize(entry.get("title", ""))
-                summary = normalize(
-                    re.sub("<.*?>", " ", entry.get("summary", ""))
+                feed = feedparser.parse(url)
+
+                for entry in feed.entries[:20]:
+
+                    title = entry.get("title", "")
+                    link = entry.get("link", "")
+                    published = entry.get("published", "")
+
+                    text = f"{title} {published}"
+
+                    detected_theme = detect_theme(text)
+
+                    material, material_score = detect_material(text)
+
+                    companies = extract_companies(title)
+
+                    # テーマスコア
+                    theme_score = 10 if detected_theme != "その他" else 0
+
+                    # 企業が明確なら加点
+                    company_score = 15 if companies else 0
+
+                    total_score = min(
+                        theme_score +
+                        material_score +
+                        company_score,
+                        100
+                    )
+
+                    results.append({
+                        "取得日": datetime.now(
+                            timezone.utc
+                        ).strftime("%Y-%m-%d"),
+
+                        "テーマ": detected_theme,
+
+                        "企業": " / ".join(companies),
+
+                        "材料": material,
+
+                        "重要度": importance_level(
+                            total_score
+                        ),
+
+                        "スコア": total_score,
+
+                        "タイトル": title,
+
+                        "公開日時": published,
+
+                        "URL": link,
+                    })
+
+            except Exception as e:
+
+                print(
+                    f"RSS取得エラー: {url} / {e}"
                 )
-                link = entry.get("link", "")
 
-                themes = detect_themes(title, summary)
+    return results
 
-                if not themes:
-                    continue
 
-                score, reasons = score_article(
-                    title,
-                    summary,
-                    themes
-                )
+# ============================================================
+# 重複除去
+# ============================================================
 
-                results.append({
-                    "date": today,
-                    "score": score,
-                    "themes": " / ".join(themes),
-                    "title": title,
-                    "reasons": reasons,
-                    "link": link
-                })
+def remove_duplicates(results):
 
-        except Exception as e:
-            print("RSS error:", e)
+    seen = set()
+    unique = []
 
-    # スコア順
-    results.sort(
-        key=lambda x: x["score"],
-        reverse=True
-    )
+    for item in results:
+
+        key = (
+            item["タイトル"]
+            .strip()
+            .lower()
+        )
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+        unique.append(item)
+
+    return unique
+
+
+# ============================================================
+# CSV保存
+# ============================================================
+
+def save_csv(results):
 
     os.makedirs("data", exist_ok=True)
 
-    filename = f"data/radar_{today}.csv"
+    today = datetime.now(
+        timezone.utc
+    ).strftime("%Y-%m-%d")
+
+    filename = (
+        f"data/radar_{today}.csv"
+    )
+
+    fields = [
+        "取得日",
+        "テーマ",
+        "企業",
+        "材料",
+        "重要度",
+        "スコア",
+        "タイトル",
+        "公開日時",
+        "URL",
+    ]
+
+    # スコア順
+    results.sort(
+        key=lambda x: x["スコア"],
+        reverse=True
+    )
 
     with open(
         filename,
@@ -203,38 +474,60 @@ def main():
 
         writer = csv.DictWriter(
             f,
-            fieldnames=[
-                "date",
-                "score",
-                "themes",
-                "title",
-                "reasons",
-                "link"
-            ]
+            fieldnames=fields
         )
 
         writer.writeheader()
 
-        for row in results:
-            writer.writerow(row)
+        writer.writerows(results)
 
-    print("")
-    print("================================")
-    print(" Future Stock Radar")
-    print("================================")
-    print(f"Date: {today}")
-    print(f"Articles found: {len(results)}")
-    print("")
-    
-    for row in results[:10]:
+    return filename
+
+
+# ============================================================
+# メイン処理
+# ============================================================
+
+def main():
+
+    print("=" * 60)
+    print("Future Stock Radar v2")
+    print("テンバガー早期発見システム")
+    print("=" * 60)
+
+    results = collect_news()
+
+    results = remove_duplicates(results)
+
+    filename = save_csv(results)
+
+    print()
+    print(
+        f"取得ニュース数: {len(results)}"
+    )
+
+    print()
+    print("🔥 TOP 20")
+    print("-" * 60)
+
+    for item in results[:20]:
+
         print(
-            f"[{row['score']:>3}] "
-            f"{row['themes']} | "
-            f"{row['title']}"
+            f"[{item['スコア']:3}] "
+            f"{item['重要度']} "
+            f"{item['テーマ']} | "
+            f"{item['企業']} | "
+            f"{item['材料']}"
         )
 
-    print("")
-    print("Report saved:", filename)
+        print(
+            f"      {item['タイトル'][:100]}"
+        )
+
+    print()
+    print(
+        f"保存完了: {filename}"
+    )
 
 
 if __name__ == "__main__":
