@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: future-stock-radar
+  cancel-in-progress: false
+
 jobs:
   radar:
     runs-on: ubuntu-latest
