@@ -1,4 +1,4 @@
-name: Daily Future Stock Radar v3
+name: Daily Future Stock Radar
 
 on:
   schedule:
@@ -15,24 +15,21 @@ concurrency:
 jobs:
   radar:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip"
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run radar v3
+      - name: Run radar
         run: python radar.py
 
       - name: Save results
@@ -44,7 +41,7 @@ jobs:
             echo "No changes to save."
             exit 0
           fi
-          git commit -m "Update daily radar v3"
+          git commit -m "Update daily radar"
           git fetch origin main
           git rebase origin/main
           git push origin HEAD:main
