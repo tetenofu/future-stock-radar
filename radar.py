@@ -76,9 +76,9 @@ COMPANY_ALIASES = {
     '東京海上': '8766.T', '東京海上ホールディングス': '8766.T',
     'キオクシア': '285A.T', 'Kioxia': '285A.T',
     'メディアリンクス': '6659.T', 'Media Links': '6659.T',
-    '海帆': '3133.T', 'FIG': '4392.T', 'Kopin': 'KOPN',
+    '海帆': '3133.T', 'Kopin': 'KOPN',
     '京セラ': '6971.T', 'Kyocera': '6971.T',
-    'ソフトバンク': '9434.T', 'SoftBank': '9434.T',
+    'ソフトバンク': '9434.T', 'SoftBank Corp.': '9434.T',
     '富士通': '6702.T', 'Fujitsu': '6702.T',
     'NEC': '6701.T', '日本電気': '6701.T',
     '日立': '6501.T', 'Hitachi': '6501.T',
@@ -114,7 +114,9 @@ IGNORE_TICKERS = {
     'EPS','EV','EBITDA','IPO','IR','SEC','EU','UK','U.S','USA','THE','AND','FOR','NEW','INC','LTD',
 }
 TICKER_RE = re.compile(r'(?<![A-Z])\$?([A-Z]{2,5})(?:\.([A-Z]{1,3}))?(?![A-Z])')
-JP_CODE_RE = re.compile(r'(?<!\d)(\d{4})(?:\.T)?(?!\d)')
+JP_EXPLICIT_CODE_RE = re.compile(r'(?<!\d)(\d{4})\.T(?!\d)', re.I)
+JP_MARKED_CODE_RE = re.compile(r'(?:証券コード|銘柄コード|コード|ticker|code)\s*[:：#]?\s*(\d{4})(?!\d)', re.I)
+NON_EQUITY_WORDS = ('etf','etn','fund','trust','index','futures','future','leveraged','inverse','bear','bull','note','notes','commodity','bond','reit')
 
 
 def normalize_text(text):
@@ -153,12 +155,20 @@ def company_candidates(text):
     lower = text.lower()
     found = []
     for alias, ticker in COMPANY_ALIASES.items():
-        if ticker and alias.lower() in lower:
+        if not ticker:
+            continue
+        # Company aliases are matched as explicit names; avoid loose generic acronyms.
+        if alias.lower() in lower:
             found.append((alias, ticker, 'alias'))
-    for m in JP_CODE_RE.finditer(text):
-        found.append((m.group(1), m.group(1) + '.T', 'code'))
-    # Only accept uppercase ticker-like tokens when they are in our known universe.
-    known_tickers = set(COMPANY_ALIASES.values()) - {None}
+
+    # Japanese stock codes are accepted ONLY when explicitly written as 1234.T
+    # or accompanied by a clear code marker. Bare 4-digit numbers are never tickers.
+    for m in JP_EXPLICIT_CODE_RE.finditer(text):
+        found.append((m.group(1), m.group(1) + '.T', 'explicit_code'))
+    for m in JP_MARKED_CODE_RE.finditer(text):
+        found.append((m.group(1), m.group(1) + '.T', 'marked_code'))
+
+    known_tickers = {t for t in COMPANY_ALIASES.values() if t}
     known_plain = {t.split('.')[0] for t in known_tickers}
     for m in TICKER_RE.finditer(text):
         token = m.group(1)
@@ -166,6 +176,7 @@ def company_candidates(text):
             continue
         if token in known_plain:
             found.append((token, token, 'ticker'))
+
     out, seen = [], set()
     for name, ticker, source in found:
         if ticker in seen:
@@ -291,12 +302,24 @@ def calculate_financial_quality(ticker, cache):
         'PER': None, 'PBR': None, 'PSR': None, '配当利回り': None, '配当性向': None,
         '自己株買い': '未取得', '利益品質': '未判定', 'バリュートラップ': '未判定',
         '配当性向引き上げ余地': '未判定', '株主還元姿勢': '未判定',
-        '価格帯': '未取得', 'しこり判定': '未判定', '財務データ取得': '未取得',
+        '価格帯': '未取得', 'しこり判定': '未判定', '財務データ取得': '未取得', '実在確認': '未確認', '候補種別': '未判定', '企業関与': '要確認',
     }
     try:
         tk = yf.Ticker(ticker)
         info = tk.info or {}
         r['企業名'] = info.get('longName') or info.get('shortName') or '未取得'
+        quote_type = str(info.get('quoteType') or '').upper()
+        security_name = str(r['企業名'] or '').lower()
+        exchange_name = str(info.get('exchange') or '').lower()
+        is_equity = quote_type == 'EQUITY'
+        is_non_equity_name = any(w in security_name for w in NON_EQUITY_WORDS)
+        if is_equity and not is_non_equity_name:
+            r['実在確認'] = '確認済'
+            r['候補種別'] = '事業会社'
+        else:
+            r['実在確認'] = '除外'
+            r['候補種別'] = '非株式・投資商品'
+            raise ValueError(f'非株式商品または株式確認不可: quoteType={quote_type}, name={r["企業名"]}, exchange={exchange_name}')
         r['市場'] = info.get('exchange') or info.get('fullExchangeName') or '未取得'
         r['通貨'] = info.get('currency') or r['通貨']
         if r['通貨'] == 'JPY': r['通貨'] = '円'
@@ -377,6 +400,9 @@ def calculate_financial_quality(ticker, cache):
         r['価格帯'], r['しこり判定'] = volume_profile(hist, r['株価'], r['通貨'])
         r['財務データ取得'] = '取得'
     except Exception as e:
+        if r.get('実在確認') != '確認済':
+            r['実在確認'] = '未確認' if r.get('実在確認') == '未確認' else r.get('実在確認')
+            r['候補種別'] = '未確認' if r.get('候補種別') == '未判定' else r.get('候補種別')
         r['財務データ取得'] = f'取得エラー: {type(e).__name__}'
     cache[ticker] = r
     return r
@@ -386,9 +412,10 @@ def score_candidate(article_score, theme, fundamentals, article_count, theme_cou
     score = min(article_score, 35)
     reasons, risks = [], []
     if theme != 'その他': score += 10; reasons.append('成長テーマとの関連')
-    score += min(10, max(0, article_count - 1) * 2)
+    # News volume is evidence, not a proxy for company quality. Cap it tightly.
+    score += min(4, max(0, article_count - 1))
     if article_count >= 2: reasons.append(f'複数材料を検出（{article_count}件）')
-    if theme_count >= 2: score += 5; reasons.append(f'複数テーマ接点（{theme_count}）')
+    if theme_count >= 2: score += 3; reasons.append(f'複数テーマ接点（{theme_count}）')
     for key, pts, label in [('売上成長率',8,'売上成長'),('営業利益成長率',8,'営業利益成長'),('EPS成長率',10,'EPS成長'),('ROE',5,'ROE'),('ROIC',5,'ROIC')]:
         v = fundamentals.get(key)
         if v is not None and v > 10: score += pts; reasons.append(f'{label}が強い')
@@ -403,6 +430,15 @@ def score_candidate(article_score, theme, fundamentals, article_count, theme_cou
     elif fundamentals.get('バリュートラップ') == '低バリュエーションだが要精査': reasons.append('低バリュエーションだが成長・CFを要確認')
     if fundamentals.get('配当性向引き上げ余地') == '高': score += 5; reasons.append('配当性向引き上げ余地が高い')
     if fundamentals.get('株主還元姿勢') == '利益成長に対して還元余地あり': score += 3; reasons.append('株主還元余地')
+    # Tenbagger room: large incumbents should not outrank smaller companies solely on news volume.
+    mc = fundamentals.get('時価総額')
+    if mc is not None:
+        if mc < 1e11: score += 10; reasons.append('小型株で時価総額余地')
+        elif mc < 5e11: score += 7; reasons.append('中小型で時価総額余地')
+        elif mc < 1e12: score += 4
+        elif mc < 3e12: score += 1
+        elif mc >= 1e13: score -= 8; risks.append('時価総額が大きく10倍余地は限定的')
+
     trap = fundamentals.get('しこり判定')
     if trap == '上値しこり警戒': risks.append('上値しこり')
     elif trap == '下値支持候補': score += 3; reasons.append('下値支持候補')
@@ -456,6 +492,9 @@ def build_company_rows(articles):
     for ticker in ranked_tickers:
         items = by_ticker[ticker]
         f = calculate_financial_quality(ticker, cache)
+        if f.get('実在確認') != '確認済' or f.get('候補種別') != '事業会社':
+            print(f'候補除外: {ticker} / {f.get("企業名")} / {f.get("財務データ取得")}')
+            continue
         unique_articles = {x[0]['URL'] or x[0]['タイトル'] for x in items}
         unique_themes = {x[0]['テーマ'] for x in items}
         best = max(items, key=lambda x: x[0]['材料スコア'])
@@ -470,7 +509,7 @@ def make_row(a, f, ticker, score, reasons, risks, article_count, theme_count, it
         return f.get(key) if f.get(key) is not None else '未取得'
     return {
         '取得日': TODAY, 'テーマ': a['テーマ'], '企業': f.get('企業名') if f.get('企業名') != '未取得' else ticker,
-        '証券コード・ティッカー': ticker, '市場': f.get('市場','未取得'), '通貨': f.get('通貨','$'),
+        '証券コード・ティッカー': ticker, '実在確認': f.get('実在確認','未確認'), '候補種別': f.get('候補種別','未判定'), '市場': f.get('市場','未取得'), '通貨': f.get('通貨','$'),
         '材料': a['材料'], '材料件数': article_count, 'テーマ接点数': theme_count,
         '重要度': importance(score), '総合スコア': score, '理由': ' / '.join(reasons) if reasons else '要追加調査',
         'リスク': ' / '.join(risks) if risks else '主要な警戒条件は未検出',
@@ -482,7 +521,7 @@ def make_row(a, f, ticker, score, reasons, risks, article_count, theme_count, it
         'バリュートラップ': f.get('バリュートラップ'), '配当性向引き上げ余地': f.get('配当性向引き上げ余地'),
         '株主還元姿勢': f.get('株主還元姿勢'), '価格帯': f.get('価格帯'), 'しこり判定': f.get('しこり判定'),
         'タイトル': a['タイトル'], '原文タイトル': a['原文タイトル'], '公開日時': a['公開日時'], 'URL': a['URL'],
-        '関連タイトル数': len(items),
+        '関連タイトル数': len(items), '企業関与': '直接候補' if any(x[2] in ('alias','ticker') for x in items) else 'コード経由・要確認',
     }
 
 
@@ -491,7 +530,7 @@ def build_unidentified_rows(articles):
     for a in articles:
         if a['企業候補']: continue
         rows.append({
-            '取得日': TODAY, 'テーマ': a['テーマ'], '企業': '未特定', '証券コード・ティッカー': '未特定',
+            '取得日': TODAY, 'テーマ': a['テーマ'], '企業': '未特定', '証券コード・ティッカー': '未特定', '実在確認': '未確認', '候補種別': '未特定',
             '市場':'未取得','通貨':'未取得','材料':a['材料'],'材料件数':1,'テーマ接点数':1,
             '重要度':importance(a['材料スコア']),'総合スコア':a['材料スコア'],'理由':'企業未特定。材料の企業帰属を確認',
             'リスク':'企業特定前のため評価未確定','株価':'未取得','PER':'未取得','PBR':'未取得','PSR':'未取得','EPS':'未取得',
@@ -519,11 +558,11 @@ def save_top(rows):
     path = f'data/top_candidates_{TODAY}.md'
     ranked = [r for r in rows if r.get('証券コード・ティッカー') != '未特定'][:20]
     with open(path,'w',encoding='utf-8') as f:
-        f.write(f'# Future Stock Radar v3.1 — {TODAY}\n\n')
+        f.write(f'# Future Stock Radar v3.2 — {TODAY}\n\n')
         f.write('> 調査優先度であり、売買推奨ではありません。未取得データは推測していません。\n\n')
         for i,r in enumerate(ranked,1):
             f.write(f"## {i}位 {r['企業']}（{r['証券コード・ティッカー']}） — {r['総合スコア']}/100\n")
-            f.write(f"- テーマ：{r['テーマ']} / 材料：{r['材料']} / 材料件数：{r['材料件数']}\n")
+            f.write(f"- テーマ：{r['テーマ']} / 材料：{r['材料']} / 材料件数：{r['材料件数']} / 企業関与：{r.get('企業関与','要確認')}\n")
             f.write(f"- 判定：{r['重要度']} / 株価：{r['株価']}{r['通貨']} / 時価総額：{r['時価総額']}\n")
             f.write(f"- PER：{r['PER']} / PBR：{r['PBR']} / PSR：{r['PSR']} / EPS：{r['EPS']}\n")
             f.write(f"- 売上成長率：{r['売上成長率']} / 営業利益成長率：{r['営業利益成長率']} / EPS成長率：{r['EPS成長率']}\n")
@@ -538,6 +577,7 @@ def save_top(rows):
 
 def main():
     articles = collect_news()
+    cache = {}
     rows = build_company_rows(articles)
     rows.extend(build_unidentified_rows(articles))
     rows.sort(key=lambda r: safe_num(r.get('総合スコア')) or -1, reverse=True)
