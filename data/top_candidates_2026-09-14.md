@@ -59,7 +59,7 @@
 - URL：https://news.google.com/rss/articles/CBMib0FVX3lxTE04bjJrMXJzdUxmZUktVC1CQXVjQ1ZUU09YQmpqNk1qYm5QMTR1ZGhKSWlFLVJoRC1iUG9XTk05dy1NV1lEeUp6ZUdMdzhYQW04Z1B1MEVWclZod2xuWWFCRmtYYWdRclJ5eWpjd3VvWQ?oc=5
 
 ## 5位 Excelerate Energy, Inc.（EE） — 78/100
-- テーマ：光通信 / 材料：大企業との提携 / 研究開発 / 材料件数：9 / 企業関与：直接候補
+- テーマ：光通信 / 材料：大企業との提携 / 研究開発 / 材料件数：10 / 企業関与：直接候補
 - 判定：🔥 最優先調査 / 株価：38.41$ / 時価総額：43.6億
 - PER：26.308218 / PBR：1.756528 / PSR：2.9604518 / EPS：1.28
 - 売上成長率：44.257649127298905 / 営業利益成長率：39.9669759761855 / EPS成長率：0.7874015748031482
@@ -67,7 +67,7 @@
 - バリュートラップ：低バリュートラップ条件なし / 配当性向引き上げ余地：中
 - 株主還元姿勢：要IR確認
 - 価格帯：$26.31～$26.80（出来高比7.8%） / $27.77～$28.26（出来高比4.7%） / $24.36～$24.85（出来高比4.4%） / しこり判定：下値支持候補
-- 理由：成長テーマとの関連 / 複数材料を検出（9件） / 複数テーマ接点（3） / 売上成長が強い / 営業利益成長が強い / 営業CFプラス / 小型株で時価総額余地 / 下値支持候補
+- 理由：成長テーマとの関連 / 複数材料を検出（10件） / 複数テーマ接点（3） / 売上成長が強い / 営業利益成長が強い / 営業CFプラス / 小型株で時価総額余地 / 下値支持候補
 - リスク：利益品質：特別損益影響を要確認
 - 原文：IOWNが宇宙へ、NTTとMBRYONICSが光通信モジュール開発で協業：10倍以上の通信速度向上へ - EE Times Japan
 - URL：https://news.google.com/rss/articles/CBMib0FVX3lxTE9xVXVmOFVhemo0VDlJWWZleHlncll2Nk5OU3VLMTdKek9uXzFRRTVEZDFfLWpYa2Q4bE9pNWVGYmVseGdsMjl3cHlaOGgwOE1xa2VGTlpBUDh2NldhYV9vYkhNZDExUXRkQjZyTWlXbw?oc=5
@@ -83,7 +83,7 @@
 - 価格帯：4037円～4113円（出来高比6.8%） / 2604円～2679円（出来高比5.5%） / 4264円～4339円（出来高比5.0%） / しこり判定：下値支持候補
 - 理由：成長テーマとの関連 / 複数材料を検出（18件） / 複数テーマ接点（4） / 営業利益成長が強い / EPS成長が強い / ROEが強い / 営業CFプラス / 利益の質が良好 / 配当性向引き上げ余地が高い / 株主還元余地 / 下値支持候補
 - リスク：主要な警戒条件は未検出
-- 原文：2026 Chiplet High-Speed Interconnect Chip Industry Research Report｜QYResearch - note.com
+- 原文：2026 Chiplet High-Speed Interconnect Chip Industry Research Report｜QYResearch - note
 - URL：https://news.google.com/rss/articles/CBMiX0FVX3lxTFAtcU96Qlg3YlFRT1Q4bVZxZzk5WEU2X1VXTUotSHVxSVFJNTdmdFZyd19kVVBoRzRvOFNXeWRpdURKYWRDMDlGRUlJUUNjVk1NWTV1YUpsZDM2QzVxaVRJ?oc=5
 
 ## 7位 Coherent Corp.（COHR） — 70/100
@@ -181,7 +181,7 @@
 - 価格帯：$162.71～$174.63（出来高比12.5%） / $174.63～$186.55（出来高比10.7%） / $150.79～$162.71（出来高比8.7%） / しこり判定：下値支持候補
 - 理由：成長テーマとの関連 / 複数材料を検出（3件） / ROEが強い / 営業CFプラス / 利益の質が良好 / 株主還元余地 / 中小型で時価総額余地 / 下値支持候補
 - リスク：主要な警戒条件は未検出
-- 原文：Applied Materials unveils integrated tools for HBM, chiplet, and 3D packaging scale-up - digitimes.com
+- 原文：Applied Materials unveils integrated tools for HBM, chiplet, and 3D packaging scale-up - digitimes
 - URL：https://news.google.com/rss/articles/CBMipgFBVV95cUxOWWN1YTU2Rjk1LWMyV05ob3I5WmhjOXZfNElKNlBEZ1lSVlN5RmI3d0tCcXJ2S3lxSVAxNzFrc2hQcExJM0FTVXJXRWZ3TVBXV1N3NEtWOG0zRVlfSFNhN0Npald4MzRrdUIxQjVmSkEtbjNpVE1qb1N3ellvQnRDTzEtTWdpSzNEN1htV0xXckVmaVowb2Mybm5ncTRLc253OXU3S0tB?oc=5
 
 ## 14位 SoftBank Corp.（9434.T） — 38/100
