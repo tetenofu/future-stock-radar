@@ -1,590 +1,615 @@
+from __future__ import annotations
+
 import csv
-import os
-import re
+import json
 import math
-from collections import defaultdict
-from datetime import datetime, timezone, timedelta
+import re
+import time
+from dataclasses import dataclass, asdict
+from datetime import datetime, timezone
+from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import feedparser
+import pandas as pd
+import requests
 import yfinance as yf
+from bs4 import BeautifulSoup
+from dateutil import parser as dtparser
 
-JST = timezone(timedelta(hours=9))
-TODAY = datetime.now(JST).strftime('%Y-%m-%d')
+ROOT = Path(__file__).resolve().parent
+DATA = ROOT / "data"
+DATA.mkdir(exist_ok=True)
 
-RSS_FEEDS = {
-    'AIデータセンター': [
-        'https://news.google.com/rss/search?q=AI+data+center&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=AI+データセンター&hl=ja&gl=JP&ceid=JP:ja',
-        'https://news.google.com/rss/search?q=データセンター+電力&hl=ja&gl=JP&ceid=JP:ja',
-    ],
-    '光通信': [
-        'https://news.google.com/rss/search?q=co-packaged+optics&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=silicon+photonics&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=光通信+シリコンフォトニクス&hl=ja&gl=JP&ceid=JP:ja',
-        'https://news.google.com/rss/search?q=IOWN+光通信&hl=ja&gl=JP&ceid=JP:ja',
-    ],
-    '冷却・熱管理': [
-        'https://news.google.com/rss/search?q=liquid+cooling+data+center&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=immersion+cooling&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=データセンター+液冷&hl=ja&gl=JP&ceid=JP:ja',
-        'https://news.google.com/rss/search?q=半導体+冷却+熱管理&hl=ja&gl=JP&ceid=JP:ja',
-    ],
-    '電力・蓄電': [
-        'https://news.google.com/rss/search?q=data+center+power+grid&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=energy+storage+data+center&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=データセンター+電力+蓄電&hl=ja&gl=JP&ceid=JP:ja',
-        'https://news.google.com/rss/search?q=蓄電池+送電網&hl=ja&gl=JP&ceid=JP:ja',
-    ],
-    '半導体': [
-        'https://news.google.com/rss/search?q=advanced+packaging+semiconductor&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=chiplet+HBM&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=compound+semiconductor+GaN+SiC&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=半導体+先端パッケージ+HBM&hl=ja&gl=JP&ceid=JP:ja',
-        'https://news.google.com/rss/search?q=GaN+SiC+半導体&hl=ja&gl=JP&ceid=JP:ja',
-    ],
-    '宇宙': [
-        'https://news.google.com/rss/search?q=space+data+center&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=satellite+computing+optical+communication&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=宇宙+データセンター&hl=ja&gl=JP&ceid=JP:ja',
-        'https://news.google.com/rss/search?q=衛星+光通信&hl=ja&gl=JP&ceid=JP:ja',
-    ],
-    '宇宙熱管理': [
-        'https://news.google.com/rss/search?q=spacecraft+thermal+management+radiator&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=宇宙+熱管理+ラジエーター&hl=ja&gl=JP&ceid=JP:ja',
-    ],
-    '宇宙太陽光・発電': [
-        'https://news.google.com/rss/search?q=space+solar+power&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=宇宙太陽光+発電&hl=ja&gl=JP&ceid=JP:ja',
-    ],
-}
-
-MATERIALS = {
-    '大型受注': (['order', 'orders', 'purchase order', 'follow-on order', 'contract', '受注', '大型受注', '契約'], 30),
-    '量産・生産開始': (['production', 'mass production', 'volume production', 'manufacturing', '量産', '生産開始'], 25),
-    '大企業との提携': (['partnership', 'strategic partnership', 'collaboration', 'alliance', '提携', '協業', '共同開発'], 25),
-    '戦略的投資': (['strategic investment', 'invests', 'funding', '出資', '戦略投資'], 22),
-    '政府支援': (['government', 'subsidy', 'grant', 'government funding', '政府', '補助金', '助成金'], 20),
-    '特許・技術': (['patent', 'patented', 'intellectual property', 'breakthrough', 'new technology', '特許', '新技術', '技術革新'], 15),
-    '研究開発': (['research', 'development', 'r&d', 'demonstration', 'prototype', '研究', '開発', '実証', '試作'], 12),
-    '設備投資': (['capital expenditure', 'capex', 'factory expansion', 'facility expansion', 'new facility', '設備投資', '工場増設'], 18),
-    '業績上方修正': (['raises outlook', 'raised guidance', 'higher revenue', 'record revenue', 'record sales', '上方修正', '最高益', '増収'], 30),
-}
-
-# Conservative aliases. Unknown companies are left unclassified rather than guessed.
-COMPANY_ALIASES = {
-    'NTT': '9432.T', '日本電信電話': '9432.T',
-    '東京海上': '8766.T', '東京海上ホールディングス': '8766.T',
-    'キオクシア': '285A.T', 'Kioxia': '285A.T',
-    'メディアリンクス': '6659.T', 'Media Links': '6659.T',
-    '海帆': '3133.T', 'Kopin': 'KOPN',
-    '京セラ': '6971.T', 'Kyocera': '6971.T',
-    'ソフトバンク': '9434.T', 'SoftBank Corp.': '9434.T',
-    '富士通': '6702.T', 'Fujitsu': '6702.T',
-    'NEC': '6701.T', '日本電気': '6701.T',
-    '日立': '6501.T', 'Hitachi': '6501.T',
-    '三菱重工': '7011.T', 'Mitsubishi Heavy Industries': '7011.T',
-    '古野電気': '6814.T', 'Furuno': '6814.T',
-    '浜松ホトニクス': '6965.T', 'Hamamatsu Photonics': '6965.T',
-    '住友電工': '5802.T', 'Sumitomo Electric': '5802.T',
-    'フジクラ': '5803.T', 'Fujikura': '5803.T',
-    'アドバンテスト': '6857.T', 'Advantest': '6857.T',
-    'ディスコ': '6146.T', 'Disco': '6146.T',
-    '東京エレクトロン': '8035.T', 'Tokyo Electron': '8035.T',
-    'ソシオネクスト': '6526.T', 'Socionext': '6526.T',
-    '信越化学': '4063.T', 'Shin-Etsu': '4063.T',
-    'ローム': '6963.T', 'ROHM': '6963.T',
-    'レーザーテック': '6920.T', 'Lasertec': '6920.T',
-    'Aehr Test Systems': 'AEHR', 'Amkor Technology': 'AMKR',
-    'Advanced Micro Devices': 'AMD', 'AMD': 'AMD',
-    'NVIDIA': 'NVDA', 'Nvidia': 'NVDA',
-    'Broadcom': 'AVGO', 'Marvell': 'MRVL',
-    'Micron': 'MU', 'Micron Technology': 'MU',
-    'Intel': 'INTC', 'Applied Materials': 'AMAT',
-    'Lam Research': 'LRCX', 'Coherent': 'COHR',
-    'Lumentum': 'LITE', 'Corning': 'GLW',
-    'Vertiv': 'VRT', 'Super Micro Computer': 'SMCI',
-    'Arista Networks': 'ANET', 'Cisco': 'CSCO',
-    'Equinix': 'EQIX', 'Digital Realty': 'DLR',
-    'Excelerate Energy': 'EE', 'Thales': 'HO.PA',
-    'MBRYONICS': None,
-}
-
-IGNORE_TICKERS = {
-    'AI','US','CEO','GPU','HBM','R&D','USD','NASA','DOE','ROE','ROIC','PBR','PER','CF',
-    'EPS','EV','EBITDA','IPO','IR','SEC','EU','UK','U.S','USA','THE','AND','FOR','NEW','INC','LTD',
-}
-TICKER_RE = re.compile(r'(?<![A-Z])\$?([A-Z]{2,5})(?:\.([A-Z]{1,3}))?(?![A-Z])')
-JP_EXPLICIT_CODE_RE = re.compile(r'(?<!\d)(\d{4})\.T(?!\d)', re.I)
-JP_MARKED_CODE_RE = re.compile(r'(?:証券コード|銘柄コード|コード|ticker|code)\s*[:：#]?\s*(\d{4})(?!\d)', re.I)
-NON_EQUITY_WORDS = ('etf','etn','fund','trust','index','futures','future','leveraged','inverse','bear','bull','note','notes','commodity','bond','reit')
+CONFIG = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
+JST = ZoneInfo(CONFIG["timezone"])
+TODAY = datetime.now(JST).date().isoformat()
+UA = "future-stock-radar/4.0 (+https://github.com/)"
 
 
-def normalize_text(text):
-    return re.sub(r'\s+', ' ', text or '').strip()
+def na(v):
+    return v is None or (isinstance(v, float) and math.isnan(v)) or str(v).strip() in {"", "NA", "N/A", "None", "nan"}
 
 
-def detect_theme(text):
-    t = text.lower()
-    rules = {
-        'AIデータセンター': ['ai data center', 'data center', 'データセンター', 'hyperscale'],
-        '光通信': ['co-packaged optics', 'silicon photonics', 'optical i/o', 'optical interconnect', '光通信', 'フォトニクス', 'iown'],
-        '冷却・熱管理': ['liquid cooling', 'immersion cooling', 'thermal management', 'heat exchanger', '液冷', '熱管理', 'ラジエーター'],
-        '電力・蓄電': ['data center power', 'energy storage', 'fuel cell', 'grid', '蓄電', '送電', '電力'],
-        '半導体': ['advanced packaging', 'chiplet', 'hbm', 'compound semiconductor', 'gan', 'sic', '半導体', '先端パッケージ'],
-        '宇宙': ['space data center', 'orbital data center', 'satellite computing', 'space optical communication', '宇宙', '衛星'],
-        '宇宙熱管理': ['space radiator', 'spacecraft thermal', 'heat rejection', '宇宙熱', '宇宙機熱'],
-        '宇宙太陽光・発電': ['space solar power', 'space solar panel', 'space energy', '宇宙太陽光'],
-    }
-    for theme, keys in rules.items():
-        if any(k in t for k in keys):
-            return theme
-    return 'その他'
-
-
-def detect_material(text):
-    t = text.lower()
-    found, score = [], 0
-    for material, (keys, pts) in MATERIALS.items():
-        if any(k.lower() in t for k in keys):
-            found.append(material)
-            score += pts
-    return (' / '.join(found) if found else 'テーマ関連ニュース'), min(score, 100)
-
-
-def company_candidates(text):
-    lower = text.lower()
-    found = []
-    for alias, ticker in COMPANY_ALIASES.items():
-        if not ticker:
-            continue
-        # Company aliases are matched as explicit names; avoid loose generic acronyms.
-        if alias.lower() in lower:
-            found.append((alias, ticker, 'alias'))
-
-    # Japanese stock codes are accepted ONLY when explicitly written as 1234.T
-    # or accompanied by a clear code marker. Bare 4-digit numbers are never tickers.
-    for m in JP_EXPLICIT_CODE_RE.finditer(text):
-        found.append((m.group(1), m.group(1) + '.T', 'explicit_code'))
-    for m in JP_MARKED_CODE_RE.finditer(text):
-        found.append((m.group(1), m.group(1) + '.T', 'marked_code'))
-
-    known_tickers = {t for t in COMPANY_ALIASES.values() if t}
-    known_plain = {t.split('.')[0] for t in known_tickers}
-    for m in TICKER_RE.finditer(text):
-        token = m.group(1)
-        if token in IGNORE_TICKERS:
-            continue
-        if token in known_plain:
-            found.append((token, token, 'ticker'))
-
-    out, seen = [], set()
-    for name, ticker, source in found:
-        if ticker in seen:
-            continue
-        seen.add(ticker)
-        out.append((name, ticker, source))
-    return out[:5]
-
-
-def safe_num(x):
+def num(v):
+    if na(v):
+        return None
+    if isinstance(v, (int, float)):
+        return float(v)
+    s = str(v).replace(",", "").replace("%", "").strip()
     try:
-        if x is None:
-            return None
-        v = float(x)
-        return None if math.isnan(v) or math.isinf(v) else v
+        return float(s)
     except Exception:
         return None
 
 
-def pct(new, old):
-    new, old = safe_num(new), safe_num(old)
-    if new is None or old in (None, 0):
+def pct(a, b):
+    a, b = num(a), num(b)
+    if a is None or b is None or b <= 0:
         return None
-    return (new / old - 1) * 100
+    return (a / b - 1.0) * 100.0
 
 
-def normalize_ratio(value, percent=True):
-    v = safe_num(value)
-    if v is None:
+def safe_ratio(a, b):
+    a, b = num(a), num(b)
+    if a is None or b is None or b == 0:
         return None
-    if percent and abs(v) <= 2:
-        return v * 100
-    return v
+    return a / b
 
 
-def fmt_num(x):
-    if x is None:
-        return '未取得'
-    x = float(x)
-    sign = '-' if x < 0 else ''
-    a = abs(x)
-    if a >= 1e12: return f'{sign}{a/1e12:.2f}兆'
-    if a >= 1e8: return f'{sign}{a/1e8:.1f}億'
-    if a >= 1e4: return f'{sign}{a/1e4:.1f}万'
-    return f'{x:.2f}'
-
-
-def get_series_values(frame, row_names, periods=5):
-    if frame is None or getattr(frame, 'empty', True):
-        return []
-    for row in row_names:
-        if row in frame.index:
-            pairs = []
-            for col in frame.columns:
-                v = safe_num(frame.loc[row, col])
-                if v is not None:
-                    try:
-                        pairs.append((col, v))
-                    except Exception:
-                        pairs.append((str(col), v))
-            pairs.sort(key=lambda x: str(x[0]), reverse=True)
-            vals = [v for _, v in pairs[:periods]]
-            if vals:
-                return vals
-    return []
-
-
-def volume_profile(hist, current, currency):
-    if hist is None or hist.empty or 'Close' not in hist or 'Volume' not in hist:
-        return '未取得', '未判定'
-    try:
-        px = hist['Close'].astype(float)
-        vol = hist['Volume'].astype(float)
-        mask = (px > 0) & (vol >= 0)
-        px, vol = px[mask], vol[mask]
-        if len(px) < 60:
-            return '未取得', '未判定'
-        current = safe_num(current) or float(px.iloc[-1])
-        lo, hi = float(px.min()), float(px.max())
-        if hi <= lo or current <= 0:
-            return '未取得', '未判定'
-        # 30 price bins; aggregate volume at price, not individual acquisition prices.
-        bins = min(50, max(24, int(len(px) / 10)))
-        step = (hi - lo) / bins
-        buckets = defaultdict(float)
-        for p, v in zip(px, vol):
-            idx = min(bins - 1, max(0, int((float(p) - lo) / step)))
-            buckets[idx] += float(v)
-        total = sum(buckets.values()) or 1
-        top = sorted(buckets.items(), key=lambda x: x[1], reverse=True)[:5]
-        zones = []
-        for idx, v in top[:3]:
-            a, b = lo + idx * step, lo + (idx + 1) * step
-            share = v / total * 100
-            zones.append((a, b, share))
-        def money(v):
-            return f'{v:.0f}{currency}' if currency == '円' else f'${v:.2f}'
-        zone_text = ' / '.join(f'{money(a)}～{money(b)}（出来高比{share:.1f}%）' for a,b,share in zones)
-        above = [z for z in zones if z[0] > current * 1.05]
-        below = [z for z in zones if z[1] < current * 0.95]
-        if above:
-            nearest = min(above, key=lambda z: z[0] - current)
-            verdict = '上値しこり警戒'
-            if current > nearest[1]:
-                verdict = 'しこり吸収・上抜け候補'
-        elif below:
-            verdict = '下値支持候補'
-        else:
-            verdict = '主要価格帯付近'
-        return zone_text, verdict
-    except Exception:
-        return '未取得', '未判定'
-
-
-def calculate_financial_quality(ticker, cache):
-    if ticker in cache:
-        return cache[ticker]
-    r = {
-        'ティッカー': ticker, '企業名': '未取得', '市場': '未取得', '通貨': '円' if ticker.endswith('.T') else '$',
-        '時価総額': None, '株価': None, '売上': None, '売上成長率': None,
-        '営業利益': None, '営業利益成長率': None, 'EPS': None, 'EPS成長率': None,
-        '営業CF': None, 'ROE': None, 'ROIC': None, '利益率': None,
-        'PER': None, 'PBR': None, 'PSR': None, '配当利回り': None, '配当性向': None,
-        '自己株買い': '未取得', '利益品質': '未判定', 'バリュートラップ': '未判定',
-        '配当性向引き上げ余地': '未判定', '株主還元姿勢': '未判定',
-        '価格帯': '未取得', 'しこり判定': '未判定', '財務データ取得': '未取得', '実在確認': '未確認', '候補種別': '未判定', '企業関与': '要確認',
-    }
-    try:
-        tk = yf.Ticker(ticker)
-        info = tk.info or {}
-        r['企業名'] = info.get('longName') or info.get('shortName') or '未取得'
-        quote_type = str(info.get('quoteType') or '').upper()
-        security_name = str(r['企業名'] or '').lower()
-        exchange_name = str(info.get('exchange') or '').lower()
-        is_equity = quote_type == 'EQUITY'
-        is_non_equity_name = any(w in security_name for w in NON_EQUITY_WORDS)
-        if is_equity and not is_non_equity_name:
-            r['実在確認'] = '確認済'
-            r['候補種別'] = '事業会社'
-        else:
-            r['実在確認'] = '除外'
-            r['候補種別'] = '非株式・投資商品'
-            raise ValueError(f'非株式商品または株式確認不可: quoteType={quote_type}, name={r["企業名"]}, exchange={exchange_name}')
-        r['市場'] = info.get('exchange') or info.get('fullExchangeName') or '未取得'
-        r['通貨'] = info.get('currency') or r['通貨']
-        if r['通貨'] == 'JPY': r['通貨'] = '円'
-        elif r['通貨'] == 'USD': r['通貨'] = '$'
-        r['時価総額'] = safe_num(info.get('marketCap'))
-        r['株価'] = safe_num(info.get('currentPrice') or info.get('regularMarketPrice'))
-        r['PER'] = safe_num(info.get('trailingPE'))
-        r['PBR'] = safe_num(info.get('priceToBook'))
-        r['PSR'] = safe_num(info.get('priceToSalesTrailing12Months'))
-        r['ROE'] = normalize_ratio(info.get('returnOnEquity'))
-        r['ROIC'] = normalize_ratio(info.get('returnOnInvestedCapital'))
-        r['利益率'] = normalize_ratio(info.get('profitMargins'))
-        r['配当利回り'] = normalize_ratio(info.get('dividendYield'))
-        r['配当性向'] = normalize_ratio(info.get('payoutRatio'))
-
-        inc, cf = tk.financials, tk.cashflow
-        revenues = get_series_values(inc, ['Total Revenue', 'Operating Revenue'])
-        op = get_series_values(inc, ['Operating Income'])
-        net = get_series_values(inc, ['Net Income', 'Net Income Common Stockholders'])
-        eps = get_series_values(inc, ['Diluted EPS', 'Basic EPS', 'Normalized Diluted EPS'])
-        cfs = get_series_values(cf, ['Operating Cash Flow', 'Total Cash From Operating Activities'])
-        special = get_series_values(inc, ['Special Income Charges', 'Gain On Sale Of Security', 'Other Non Operating Income Expenses'])
-        if revenues:
-            r['売上'] = revenues[0]; r['売上成長率'] = pct(revenues[0], revenues[1]) if len(revenues)>1 else None
-        if op:
-            r['営業利益'] = op[0]; r['営業利益成長率'] = pct(op[0], op[1]) if len(op)>1 else None
-        if cfs: r['営業CF'] = cfs[0]
-        if eps:
-            r['EPS'] = eps[0]; r['EPS成長率'] = pct(eps[0], eps[1]) if len(eps)>1 else None
-        if r['EPS'] is None: r['EPS'] = safe_num(info.get('trailingEps'))
-        if r['EPS成長率'] is None:
-            r['EPS成長率'] = normalize_ratio(info.get('earningsGrowth'))
-        if net and revenues and revenues[0] != 0 and r['利益率'] is None:
-            r['利益率'] = net[0] / revenues[0] * 100
-
-        # Conservative recurring-earnings quality heuristic.
-        if r['営業CF'] is not None and r['営業利益'] is not None:
-            if r['営業CF'] > 0 and r['営業利益'] > 0:
-                r['利益品質'] = '良好'
-            elif r['営業利益'] > 0 and r['営業CF'] < 0:
-                r['利益品質'] = '警戒'
-            elif r['営業CF'] < 0 and r['営業利益'] < 0:
-                r['利益品質'] = '赤字・要注意'
-            else:
-                r['利益品質'] = '要確認'
-        # Special-item flag only when a recognizable special-income row is materially large.
-        if special and net and net[0] != 0:
-            sp = abs(special[0])
-            if sp > abs(net[0]) * 0.25:
-                r['利益品質'] = '特別損益影響を要確認'
-
-        cheap = ((r['PER'] is not None and 0 < r['PER'] <= 12) or (r['PBR'] is not None and 0 < r['PBR'] <= 1.0))
-        growths = [r['売上成長率'], r['営業利益成長率'], r['EPS成長率']]
-        deteriorating = sum(v is not None and v < -5 for v in growths)
-        weak_returns = r['ROE'] is not None and r['ROE'] < 5
-        if cheap and (deteriorating >= 2 or weak_returns or r['利益品質'] in ('警戒','赤字・要注意','特別損益影響を要確認')):
-            r['バリュートラップ'] = '警戒'
-        elif cheap:
-            r['バリュートラップ'] = '低バリュエーションだが要精査'
-        else:
-            r['バリュートラップ'] = '低バリュートラップ条件なし'
-
-        if r['配当性向'] is not None:
-            if r['配当性向'] < 25 and r['EPS成長率'] is not None and r['EPS成長率'] > 10:
-                r['配当性向引き上げ余地'] = '高'
-            elif r['配当性向'] < 40:
-                r['配当性向引き上げ余地'] = '中'
-            else:
-                r['配当性向引き上げ余地'] = '低'
-        if r['ROE'] is not None and r['ROE'] >= 10 and r['配当性向'] is not None and r['配当性向'] < 25:
-            r['株主還元姿勢'] = '利益成長に対して還元余地あり'
-        elif r['配当性向'] is not None and r['配当性向'] >= 40:
-            r['株主還元姿勢'] = '還元水準は比較的高い'
-        else:
-            r['株主還元姿勢'] = '要IR確認'
-
-        hist = tk.history(period='2y', auto_adjust=False)
-        r['価格帯'], r['しこり判定'] = volume_profile(hist, r['株価'], r['通貨'])
-        r['財務データ取得'] = '取得'
-    except Exception as e:
-        if r.get('実在確認') != '確認済':
-            r['実在確認'] = '未確認' if r.get('実在確認') == '未確認' else r.get('実在確認')
-            r['候補種別'] = '未確認' if r.get('候補種別') == '未判定' else r.get('候補種別')
-        r['財務データ取得'] = f'取得エラー: {type(e).__name__}'
-    cache[ticker] = r
+def fetch(url, timeout=20):
+    r = requests.get(url, headers={"User-Agent": UA}, timeout=timeout)
+    r.raise_for_status()
     return r
 
 
-def score_candidate(article_score, theme, fundamentals, article_count, theme_count):
-    score = min(article_score, 35)
-    reasons, risks = [], []
-    if theme != 'その他': score += 10; reasons.append('成長テーマとの関連')
-    # News volume is evidence, not a proxy for company quality. Cap it tightly.
-    score += min(4, max(0, article_count - 1))
-    if article_count >= 2: reasons.append(f'複数材料を検出（{article_count}件）')
-    if theme_count >= 2: score += 3; reasons.append(f'複数テーマ接点（{theme_count}）')
-    for key, pts, label in [('売上成長率',8,'売上成長'),('営業利益成長率',8,'営業利益成長'),('EPS成長率',10,'EPS成長'),('ROE',5,'ROE'),('ROIC',5,'ROIC')]:
-        v = fundamentals.get(key)
-        if v is not None and v > 10: score += pts; reasons.append(f'{label}が強い')
-        elif v is not None and v < -5: score -= min(pts,5); risks.append(f'{label}悪化')
-    cf = fundamentals.get('営業CF')
-    if cf is not None and cf > 0: score += 5; reasons.append('営業CFプラス')
-    elif cf is not None and cf < 0: score -= 5; risks.append('営業CFマイナス')
-    if fundamentals.get('利益品質') == '良好': score += 5; reasons.append('利益の質が良好')
-    elif fundamentals.get('利益品質') in ('警戒','赤字・要注意','特別損益影響を要確認'):
-        score -= 8; risks.append(f"利益品質：{fundamentals.get('利益品質')}")
-    if fundamentals.get('バリュートラップ') == '警戒': score -= 20; risks.append('バリュートラップ警戒')
-    elif fundamentals.get('バリュートラップ') == '低バリュエーションだが要精査': reasons.append('低バリュエーションだが成長・CFを要確認')
-    if fundamentals.get('配当性向引き上げ余地') == '高': score += 5; reasons.append('配当性向引き上げ余地が高い')
-    if fundamentals.get('株主還元姿勢') == '利益成長に対して還元余地あり': score += 3; reasons.append('株主還元余地')
-    # Tenbagger room: large incumbents should not outrank smaller companies solely on news volume.
-    mc = fundamentals.get('時価総額')
-    if mc is not None:
-        if mc < 1e11: score += 10; reasons.append('小型株で時価総額余地')
-        elif mc < 5e11: score += 7; reasons.append('中小型で時価総額余地')
-        elif mc < 1e12: score += 4
-        elif mc < 3e12: score += 1
-        elif mc >= 1e13: score -= 8; risks.append('時価総額が大きく10倍余地は限定的')
-
-    trap = fundamentals.get('しこり判定')
-    if trap == '上値しこり警戒': risks.append('上値しこり')
-    elif trap == '下値支持候補': score += 3; reasons.append('下値支持候補')
-    elif trap == 'しこり吸収・上抜け候補': score += 5; reasons.append('上値しこり吸収・上抜け候補')
-    return max(0, min(100, score)), reasons, risks
+@dataclass
+class Company:
+    name: str
+    ticker: str
+    market: str
+    aliases: tuple[str, ...] = ()
+    currency: str = ""
 
 
-def importance(score):
-    if score >= 75: return '🔥 最優先調査'
-    if score >= 60: return '🟠 優先調査'
-    if score >= 45: return '🟡 注目'
-    return '⚪ 監視'
+MASTER = [
+    Company("NVIDIA Corporation", "NVDA", "US", ("NVIDIA", "Nvidia"), "USD"),
+    Company("Advanced Micro Devices, Inc.", "AMD", "US", ("AMD", "Advanced Micro Devices"), "USD"),
+    Company("Broadcom Inc.", "AVGO", "US", ("Broadcom",), "USD"),
+    Company("Marvell Technology, Inc.", "MRVL", "US", ("Marvell",), "USD"),
+    Company("Coherent Corp.", "COHR", "US", ("Coherent",), "USD"),
+    Company("Lumentum Holdings Inc.", "LITE", "US", ("Lumentum",), "USD"),
+    Company("Applied Materials, Inc.", "AMAT", "US", ("Applied Materials",), "USD"),
+    Company("Amkor Technology, Inc.", "AMKR", "US", ("Amkor",), "USD"),
+    Company("Cisco Systems, Inc.", "CSCO", "US", ("Cisco",), "USD"),
+    Company("Intel Corporation", "INTC", "US", ("Intel",), "USD"),
+    Company("Equinix, Inc.", "EQIX", "US", ("Equinix",), "USD"),
+    Company("Aehr Test Systems", "AEHR", "US", ("Aehr", "Aehr Test Systems"), "USD"),
+    Company("Corning Incorporated", "GLW", "US", ("Corning",), "USD"),
+    Company("キオクシアホールディングス", "285A", "JP", ("キオクシア", "Kioxia"), "JPY"),
+    Company("アドバンテスト", "6857", "JP", ("アドバンテスト", "Advantest"), "JPY"),
+    Company("京セラ", "6971", "JP", ("京セラ", "Kyocera"), "JPY"),
+    Company("NTT", "9432", "JP", ("NTT", "日本電信電話"), "JPY"),
+    Company("NEC", "6701", "JP", ("NEC", "日本電気"), "JPY"),
+    Company("三菱重工業", "7011", "JP", ("三菱重工", "Mitsubishi Heavy Industries"), "JPY"),
+    Company("FIG", "4392", "JP", ("FIG",), "JPY"),
+    Company("海帆", "3133", "JP", ("海帆",), "JPY"),
+    Company("きくてっく", "3444", "JP", ("きくてっく", "菊池製作所"), "JPY"),
+]
+
+BY_ALIAS = {a.lower(): c for c in MASTER for a in c.aliases}
 
 
-def collect_news():
-    articles = []
-    for feed_theme, feeds in RSS_FEEDS.items():
-        for url in feeds:
-            try:
-                feed = feedparser.parse(url)
-                for entry in feed.entries[:25]:
-                    title = normalize_text(entry.get('title',''))
-                    summary = normalize_text(re.sub('<[^>]+>', ' ', entry.get('summary','')))
-                    link = entry.get('link','')
-                    published = entry.get('published','')
-                    if not title: continue
-                    text = f'{title} {summary}'
-                    material, material_score = detect_material(text)
-                    detected_theme = detect_theme(text)
-                    candidates = company_candidates(text)
-                    articles.append({
-                        '取得日': TODAY, 'テーマ': detected_theme if detected_theme != 'その他' else feed_theme,
-                        '企業候補': candidates, '材料': material, '材料スコア': material_score,
-                        'タイトル': title, '原文タイトル': title, '公開日時': published, 'URL': link,
-                    })
-            except Exception as e:
-                print(f'RSS取得エラー: {url} / {e}')
-    return articles
+def resolve_entity(title: str, summary: str):
+    text = f"{title} {summary}"
+    hits = []
+    for c in MASTER:
+        aliases = sorted(c.aliases, key=len, reverse=True)
+        for alias in aliases:
+            if re.search(rf"(?<![\w]){re.escape(alias)}(?![\w])", text, re.I):
+                hits.append(c)
+                break
+
+    if not hits:
+        return None, 0.0, "未特定"
+
+    # A company name appearing only in a generic market article is not enough.
+    actor_words = r"(受注|発注|提携|協業|契約|投資|出資|買収|量産|生産|供給|採用|開発|特許|製造|工場|capacity|partnership|agreement|investment|order|production|supply|develop|manufactur|acqui)"
+    actor = bool(re.search(actor_words, text, re.I))
+
+    if len(hits) == 1 and actor:
+        return hits[0], 0.92, "直接候補"
+    if len(hits) == 1:
+        return hits[0], 0.74, "関与候補"
+    return None, 0.45, "複数候補・要確認"
 
 
-def build_company_rows(articles):
-    by_ticker = defaultdict(list)
-    for a in articles:
-        for name, ticker, source in a['企業候補']:
-            by_ticker[ticker].append((a, name, source))
-
-    cache = {}
-    rows = []
-    # Limit enrichment to the strongest 80 tickers by news evidence to keep the free workflow stable.
-    ranked_tickers = sorted(by_ticker, key=lambda t: (max(x[0]['材料スコア'] for x in by_ticker[t]), len(by_ticker[t])), reverse=True)[:80]
-    for ticker in ranked_tickers:
-        items = by_ticker[ticker]
-        f = calculate_financial_quality(ticker, cache)
-        if f.get('実在確認') != '確認済' or f.get('候補種別') != '事業会社':
-            print(f'候補除外: {ticker} / {f.get("企業名")} / {f.get("財務データ取得")}')
-            continue
-        unique_articles = {x[0]['URL'] or x[0]['タイトル'] for x in items}
-        unique_themes = {x[0]['テーマ'] for x in items}
-        best = max(items, key=lambda x: x[0]['材料スコア'])
-        a = best[0]
-        score, reasons, risks = score_candidate(a['材料スコア'], a['テーマ'], f, len(unique_articles), len(unique_themes))
-        rows.append(make_row(a, f, ticker, score, reasons, risks, len(unique_articles), len(unique_themes), items))
-    return rows
+def theme_of(title: str, summary: str):
+    t = f"{title} {summary}".lower()
+    rules = [
+        ("光通信", [r"optical", r"silicon photonics", r"co-packaged optics", r"\bcpo\b", r"光通信", r"光接続", r"photonic"]),
+        ("AIデータセンター", [r"ai data cent", r"ai factory", r"gpu cluster", r"ai infrastructure", r"データセンター"]),
+        ("半導体", [r"semiconductor", r"chip", r"wafer", r"半導体", r"silicon"]),
+        ("電力・蓄電", [r"power", r"battery", r"grid", r"電力", r"蓄電"]),
+        ("冷却・熱管理", [r"cooling", r"thermal", r"liquid cooling", r"冷却", r"熱管理"]),
+    ]
+    hits = []
+    for name, pats in rules:
+        if any(re.search(p, t) for p in pats):
+            hits.append(name)
+    return hits[0] if hits else "未分類"
 
 
-def make_row(a, f, ticker, score, reasons, risks, article_count, theme_count, items):
-    def val(key):
-        return f.get(key) if f.get(key) is not None else '未取得'
-    return {
-        '取得日': TODAY, 'テーマ': a['テーマ'], '企業': f.get('企業名') if f.get('企業名') != '未取得' else ticker,
-        '証券コード・ティッカー': ticker, '実在確認': f.get('実在確認','未確認'), '候補種別': f.get('候補種別','未判定'), '市場': f.get('市場','未取得'), '通貨': f.get('通貨','$'),
-        '材料': a['材料'], '材料件数': article_count, 'テーマ接点数': theme_count,
-        '重要度': importance(score), '総合スコア': score, '理由': ' / '.join(reasons) if reasons else '要追加調査',
-        'リスク': ' / '.join(risks) if risks else '主要な警戒条件は未検出',
-        '株価': val('株価'), 'PER': val('PER'), 'PBR': val('PBR'), 'PSR': val('PSR'), 'EPS': val('EPS'),
-        'EPS成長率': val('EPS成長率'), '売上': fmt_num(f.get('売上')), '売上成長率': val('売上成長率'),
-        '営業利益': fmt_num(f.get('営業利益')), '営業利益成長率': val('営業利益成長率'), '営業CF': fmt_num(f.get('営業CF')),
-        'ROE': val('ROE'), 'ROIC': val('ROIC'), '利益率': val('利益率'), '時価総額': fmt_num(f.get('時価総額')),
-        '配当利回り': val('配当利回り'), '配当性向': val('配当性向'), '利益品質': f.get('利益品質'),
-        'バリュートラップ': f.get('バリュートラップ'), '配当性向引き上げ余地': f.get('配当性向引き上げ余地'),
-        '株主還元姿勢': f.get('株主還元姿勢'), '価格帯': f.get('価格帯'), 'しこり判定': f.get('しこり判定'),
-        'タイトル': a['タイトル'], '原文タイトル': a['原文タイトル'], '公開日時': a['公開日時'], 'URL': a['URL'],
-        '関連タイトル数': len(items), '企業関与': '直接候補' if any(x[2] in ('alias','ticker') for x in items) else 'コード経由・要確認',
+def material_type(title: str, summary: str):
+    t = f"{title} {summary}"
+    rules = [
+        ("大型受注", r"large order|major order|order worth|受注|注文"),
+        ("大企業との提携", r"strategic partnership|partnership|collaboration|agreement|提携|協業|契約"),
+        ("戦略的投資", r"strategic investment|invests? \$|invested|出資|投資"),
+        ("量産・生産開始", r"mass production|volume production|production begins|量産|生産開始"),
+        ("設備投資", r"capacity expansion|new fab|manufacturing plant|factory|設備投資|工場"),
+        ("業績上方修正", r"raises guidance|raised outlook|upward revision|上方修正"),
+        ("特許・技術", r"patent|technology|photonic|特許|技術"),
+        ("研究開発", r"research and development|r&d|研究開発"),
+    ]
+    return [name for name, pat in rules if re.search(pat, t, re.I)]
+
+
+def google_news(company_query="AI data center optical interconnect"):
+    url = "https://news.google.com/rss/search"
+    params = {"q": company_query, "hl": "en-US", "gl": "US", "ceid": "US:en"}
+    r = requests.get(url, params=params, headers={"User-Agent": UA}, timeout=20)
+    r.raise_for_status()
+    feed = feedparser.parse(r.content)
+    out = []
+    for e in feed.entries[:CONFIG["max_news_items"]]:
+        title = e.get("title", "")
+        summary = BeautifulSoup(e.get("summary", ""), "html.parser").get_text(" ", strip=True)
+        published = e.get("published", "")
+        try:
+            dt = dtparser.parse(published).astimezone(JST).isoformat()
+        except Exception:
+            dt = ""
+        out.append({"title": title, "summary": summary, "published": dt, "url": e.get("link", "")})
+    return out
+
+
+def yahoo_chart(ticker):
+    # Public chart endpoint. If unavailable, return None rather than inventing data.
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+    try:
+        r = fetch(url, 20)
+        j = r.json()["chart"]["result"][0]
+        meta = j.get("meta", {})
+        timestamps = j.get("timestamp") or []
+        closes = (j.get("indicators", {}).get("quote", [{}])[0].get("close") or [])
+        rows = []
+        for ts, close in zip(timestamps, closes):
+            if close is not None:
+                rows.append((datetime.fromtimestamp(ts, timezone.utc).date(), float(close)))
+        return meta, rows
+    except Exception:
+        return None
+
+
+def price_reaction(ticker, event_date):
+    c = yahoo_chart(ticker)
+    if not c:
+        return {}
+    _, rows = c
+    if not rows:
+        return {}
+    d = datetime.fromisoformat(event_date[:10]).date()
+    before = [x for x in rows if x[0] <= d]
+    if not before:
+        return {}
+    base = before[-1][1]
+    result = {}
+    for days, label in [(1, "1D"), (5, "5D"), (20, "20D")]:
+        future = [x for x in rows if x[0] > d]
+        if len(future) >= days:
+            result[label] = pct(future[days-1][1], base)
+    return result
+
+
+def valuation_check(price, eps, per):
+    calc = safe_ratio(price, eps)
+    if calc is None or per is None:
+        return "CHECK_REQUIRED"
+    err = abs(calc - per) / max(abs(per), 1e-9)
+    return "OK" if err <= CONFIG["valuation_consistency_tolerance"] else "⚠基準不一致"
+
+
+def growth_class(current, previous):
+    c, p = num(current), num(previous)
+    if c is None or p is None:
+        return "NA"
+    if p <= 0 < c:
+        return "赤字→黒字転換"
+    if c < 0 <= p:
+        return "黒字→赤字転落"
+    if abs(p) < 1e-9:
+        return "分母極小・NA"
+    return "通常成長率"
+
+
+def business_progress_score(materials, entity_conf, theme):
+    score = 0
+    weights = {
+        "大型受注": 30, "大企業との提携": 24, "戦略的投資": 22,
+        "量産・生産開始": 28, "設備投資": 18, "業績上方修正": 30,
+        "特許・技術": 12, "研究開発": 10
     }
+    for m in set(materials):
+        score += weights.get(m, 0)
+    if entity_conf >= 0.9:
+        score += 12
+    elif entity_conf >= 0.72:
+        score += 6
+    if theme != "未分類":
+        score += 4
+    return min(score, 100)
 
 
-def build_unidentified_rows(articles):
-    rows = []
-    for a in articles:
-        if a['企業候補']: continue
-        rows.append({
-            '取得日': TODAY, 'テーマ': a['テーマ'], '企業': '未特定', '証券コード・ティッカー': '未特定', '実在確認': '未確認', '候補種別': '未特定',
-            '市場':'未取得','通貨':'未取得','材料':a['材料'],'材料件数':1,'テーマ接点数':1,
-            '重要度':importance(a['材料スコア']),'総合スコア':a['材料スコア'],'理由':'企業未特定。材料の企業帰属を確認',
-            'リスク':'企業特定前のため評価未確定','株価':'未取得','PER':'未取得','PBR':'未取得','PSR':'未取得','EPS':'未取得',
-            'EPS成長率':'未取得','売上':'未取得','売上成長率':'未取得','営業利益':'未取得','営業利益成長率':'未取得',
-            '営業CF':'未取得','ROE':'未取得','ROIC':'未取得','利益率':'未取得','時価総額':'未取得','配当利回り':'未取得',
-            '配当性向':'未取得','利益品質':'未判定','バリュートラップ':'未判定','配当性向引き上げ余地':'未判定',
-            '株主還元姿勢':'未判定','価格帯':'未取得','しこり判定':'未判定','タイトル':a['タイトル'],
-            '原文タイトル':a['原文タイトル'],'公開日時':a['公開日時'],'URL':a['URL'],'関連タイトル数':1,
-        })
-    return rows
+def data_quality(fields):
+    checks = []
+    for x in fields:
+        checks.append(x not in (None, "", "NA", "N/A"))
+    return round(sum(checks) / len(checks) * 100, 1) if checks else 0.0
 
 
-def save_csv(rows):
-    os.makedirs('data', exist_ok=True)
-    path = f'data/radar_{TODAY}.csv'
-    fields = list(rows[0].keys()) if rows else ['取得日']
-    rows.sort(key=lambda x: safe_num(x.get('総合スコア')) or -1, reverse=True)
-    with open(path,'w',newline='',encoding='utf-8-sig') as f:
-        w=csv.DictWriter(f,fieldnames=fields); w.writeheader(); w.writerows(rows)
-    return path
+def implied_gap(progress, price_1d, price_5d, valuation_ok, data_q):
+    # Positive means business evidence is strong relative to immediate price reaction.
+    reaction = 0
+    if price_1d is not None:
+        reaction += max(min(price_1d, 20), -20) * 1.0
+    if price_5d is not None:
+        reaction += max(min(price_5d, 30), -30) * 0.5
+    gap = progress - max(reaction, 0) * 1.5
+    if valuation_ok != "OK":
+        gap *= 0.75
+    gap *= max(data_q / 100, 0.35)
+    return round(max(0, min(100, gap)), 1)
 
 
-def save_top(rows):
-    os.makedirs('data', exist_ok=True)
-    path = f'data/top_candidates_{TODAY}.md'
-    ranked = [r for r in rows if r.get('証券コード・ティッカー') != '未特定'][:20]
-    with open(path,'w',encoding='utf-8') as f:
-        f.write(f'# Future Stock Radar v3.2 — {TODAY}\n\n')
-        f.write('> 調査優先度であり、売買推奨ではありません。未取得データは推測していません。\n\n')
-        for i,r in enumerate(ranked,1):
-            f.write(f"## {i}位 {r['企業']}（{r['証券コード・ティッカー']}） — {r['総合スコア']}/100\n")
-            f.write(f"- テーマ：{r['テーマ']} / 材料：{r['材料']} / 材料件数：{r['材料件数']} / 企業関与：{r.get('企業関与','要確認')}\n")
-            f.write(f"- 判定：{r['重要度']} / 株価：{r['株価']}{r['通貨']} / 時価総額：{r['時価総額']}\n")
-            f.write(f"- PER：{r['PER']} / PBR：{r['PBR']} / PSR：{r['PSR']} / EPS：{r['EPS']}\n")
-            f.write(f"- 売上成長率：{r['売上成長率']} / 営業利益成長率：{r['営業利益成長率']} / EPS成長率：{r['EPS成長率']}\n")
-            f.write(f"- 営業CF：{r['営業CF']} / ROE：{r['ROE']} / ROIC：{r['ROIC']} / 利益品質：{r['利益品質']}\n")
-            f.write(f"- バリュートラップ：{r['バリュートラップ']} / 配当性向引き上げ余地：{r['配当性向引き上げ余地']}\n")
-            f.write(f"- 株主還元姿勢：{r['株主還元姿勢']}\n")
-            f.write(f"- 価格帯：{r['価格帯']} / しこり判定：{r['しこり判定']}\n")
-            f.write(f"- 理由：{r['理由']}\n- リスク：{r['リスク']}\n")
-            f.write(f"- 原文：{r['原文タイトル']}\n- URL：{r['URL']}\n\n")
-    return path
+def yahoo_ticker(ticker: str, market: str):
+    return ticker if market == "US" else f"{ticker}.T"
 
+
+def _statement_value(df, names, col):
+    if df is None or df.empty or col not in df.columns:
+        return None
+    for name in names:
+        if name in df.index:
+            v = df.loc[name, col]
+            if pd.notna(v):
+                return float(v)
+    return None
+
+
+def financial_snapshot(company: Company):
+    """
+    Financial layer:
+    - Uses one explicit annual fiscal period for revenue/operating income/net income/EPS.
+    - Price is current/latest market price, but every ratio is labeled by its earnings/book/revenue basis.
+    - Missing values remain None.
+    """
+    symbol = yahoo_ticker(company.ticker, company.market)
+    try:
+        tk = yf.Ticker(symbol)
+        fi = getattr(tk, "fast_info", {}) or {}
+        hist = tk.history(period="5d", auto_adjust=False)
+        price = float(hist["Close"].dropna().iloc[-1]) if not hist.empty else None
+
+        income = tk.income_stmt
+        balance = tk.balance_sheet
+        cash = tk.cashflow
+
+        if income is None or income.empty:
+            return {"取得元": "Yahoo Finance/yfinance", "整合性チェック": "DATA_UNAVAILABLE"}
+
+        cols = list(income.columns)
+        latest = cols[0] if cols else None
+        previous = cols[1] if len(cols) > 1 else None
+
+        revenue = _statement_value(income, ["Total Revenue", "Operating Revenue"], latest)
+        revenue_prev = _statement_value(income, ["Total Revenue", "Operating Revenue"], previous)
+
+        op_profit = _statement_value(income, ["Operating Income", "Operating Income Loss"], latest)
+        op_profit_prev = _statement_value(income, ["Operating Income", "Operating Income Loss"], previous)
+
+        net_income = _statement_value(income, ["Net Income", "Net Income Common Stockholders"], latest)
+        net_income_prev = _statement_value(income, ["Net Income", "Net Income Common Stockholders"], previous)
+
+        eps = _statement_value(income, ["Diluted EPS", "Basic EPS"], latest)
+        if eps is None and net_income is not None:
+            shares = _statement_value(income, ["Diluted Average Shares", "Basic Average Shares"], latest)
+            eps = safe_ratio(net_income, shares)
+
+        # Latest balance-sheet book value and cash/debt.
+        equity = _statement_value(balance, ["Stockholders Equity", "Common Stock Equity"], latest)
+        assets = _statement_value(balance, ["Total Assets"], latest)
+        cash_eq = _statement_value(balance, ["Cash Cash Equivalents And Short Term Investments", "Cash And Cash Equivalents"], latest)
+        debt = _statement_value(balance, ["Total Debt"], latest)
+        shares_out = _statement_value(balance, ["Ordinary Shares Number", "Share Issued"], latest)
+
+        # Cash flow.
+        cfo = _statement_value(cash, ["Operating Cash Flow", "Total Cash From Operating Activities"], latest)
+        capex = _statement_value(cash, ["Capital Expenditure", "Capital Expenditure Reported"], latest)
+        fcf = None
+        if cfo is not None and capex is not None:
+            fcf = cfo + capex if capex < 0 else cfo - capex
+
+        market_cap = None
+        try:
+            market_cap = float(fi.get("marketCap")) if fi.get("marketCap") is not None else None
+        except Exception:
+            pass
+        if market_cap is None and price is not None and shares_out is not None:
+            market_cap = price * shares_out
+
+        bps = safe_ratio(equity, shares_out)
+        per = safe_ratio(price, eps)
+        psr = safe_ratio(market_cap, revenue)
+        pbr = safe_ratio(price, bps)
+
+        ebitda = _statement_value(income, ["EBITDA", "Normalized EBITDA"], latest)
+        if ebitda is None and op_profit is not None:
+            da = _statement_value(cash, ["Depreciation And Amortization", "Depreciation"], latest)
+            if da is not None:
+                ebitda = op_profit + abs(da)
+
+        ev = None
+        if market_cap is not None:
+            ev = market_cap + (debt or 0) - (cash_eq or 0)
+        ev_ebitda = safe_ratio(ev, ebitda)
+
+        # ROE = net income / average equity where possible.
+        equity_prev = _statement_value(balance, ["Stockholders Equity", "Common Stock Equity"], previous)
+        avg_equity = None
+        if equity is not None and equity_prev is not None:
+            avg_equity = (equity + equity_prev) / 2
+        roe = safe_ratio(net_income, avg_equity or equity)
+
+        # ROIC = NOPAT / invested capital.
+        pretax = _statement_value(income, ["Pretax Income"], latest)
+        tax = _statement_value(income, ["Tax Provision", "Tax Provision Benefit"], latest)
+        tax_rate = None
+        if pretax is not None and pretax > 0 and tax is not None:
+            tax_rate = max(0.0, min(0.35, tax / pretax))
+        if tax_rate is None:
+            tax_rate = 0.25
+        nopat = op_profit * (1 - tax_rate) if op_profit is not None else None
+        invested_capital = None
+        if equity is not None:
+            invested_capital = equity + (debt or 0) - (cash_eq or 0)
+        roic = safe_ratio(nopat, invested_capital)
+
+        # Dividend: use trailing cash dividends from Yahoo history.
+        dividend_yield = None
+        payout = None
+        try:
+            divs = tk.dividends
+            if divs is not None and not divs.empty and price:
+                one_year_ago = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=366)
+                annual_div = float(divs[divs.index >= one_year_ago]["Dividends"].sum())
+                dividend_yield = annual_div / price * 100
+                payout = safe_ratio(annual_div, eps) * 100 if eps and eps > 0 else None
+        except Exception:
+            pass
+
+        # Profit-quality flags: detect explicit one-off / non-operating items.
+        oneoff_terms = [
+            "Gain On Sale Of Security", "Gain On Sale Of Assets",
+            "Gain On Sale Of Business", "Other Non Operating Income Expenses",
+            "Special Income Charges", "Restructuring And Mergern Acquisition",
+            "Impairment", "Write Off", "Extraordinary Items"
+        ]
+        oneoff = []
+        for term in oneoff_terms:
+            v = _statement_value(income, [term], latest)
+            if v is not None and abs(v) > max(abs(net_income or 0) * 0.05, 1):
+                oneoff.append(term)
+
+        if net_income is None:
+            quality = "未判定"
+        elif net_income <= 0:
+            quality = "赤字・要注意"
+        elif oneoff:
+            quality = "一時要因あり・要確認"
+        elif cfo is not None and cfo < 0:
+            quality = "利益と営業CFの乖離・要確認"
+        elif fcf is not None and fcf < 0:
+            quality = "FCFマイナス・要確認"
+        else:
+            quality = "暫定良好"
+
+        # Growth: never turn sign changes / tiny bases into giant percentages.
+        eps_prev = _statement_value(income, ["Diluted EPS", "Basic EPS"], previous)
+        if eps_prev is None and net_income_prev is not None:
+            shares_prev = _statement_value(income, ["Diluted Average Shares", "Basic Average Shares"], previous)
+            eps_prev = safe_ratio(net_income_prev, shares_prev)
+        eps_growth = pct(eps, eps_prev)
+        rev_growth = pct(revenue, revenue_prev)
+        op_growth = pct(op_profit, op_profit_prev)
+
+        checks = []
+        if per is not None and eps is not None and price is not None:
+            checks.append(abs(per - price / eps) / max(abs(per), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
+        if psr is not None and market_cap is not None and revenue:
+            checks.append(abs(psr - market_cap / revenue) / max(abs(psr), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
+        if pbr is not None and price is not None and bps:
+            checks.append(abs(pbr - price / bps) / max(abs(pbr), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
+        integrity = "OK" if checks and all(checks) else ("⚠要確認" if checks else "DATA_UNAVAILABLE")
+
+        return {
+            "株価": price,
+            "時価総額": market_cap,
+            "PER": per,
+            "PBR": pbr,
+            "PSR": psr,
+            "EV/EBITDA": ev_ebitda,
+            "EPS": eps,
+            "EPS成長率": eps_growth,
+            "EPS成長判定": growth_class(eps, eps_prev),
+            "売上": revenue,
+            "売上成長率": rev_growth,
+            "営業利益": op_profit,
+            "営業利益成長率": op_growth,
+            "ROE": (roe * 100 if roe is not None else None),
+            "ROIC": (roic * 100 if roic is not None else None),
+            "営業CF": cfo,
+            "FCF": fcf,
+            "配当利回り": dividend_yield,
+            "配当性向": payout,
+            "利益品質": quality,
+            "バリュエーション整合性": integrity,
+            "データ基準日": datetime.now(JST).date().isoformat(),
+            "決算期": str(latest.date()) if hasattr(latest, "date") else str(latest),
+            "指標基準": "直近年次決算ベース（株価のみ最新）",
+            "取得元": "Yahoo Finance/yfinance",
+            "整合性チェック": integrity,
+        }
+    except Exception as e:
+        return {
+            "取得元": "Yahoo Finance/yfinance",
+            "整合性チェック": f"DATA_UNAVAILABLE:{type(e).__name__}"
+        }
 
 def main():
-    articles = collect_news()
-    cache = {}
-    rows = build_company_rows(articles)
-    rows.extend(build_unidentified_rows(articles))
-    rows.sort(key=lambda r: safe_num(r.get('総合スコア')) or -1, reverse=True)
-    print(f'記事数: {len(articles)} / 企業候補: {len(rows)}')
-    print('CSV:', save_csv(rows))
-    print('TOP:', save_top(rows))
+    # Broad queries intentionally overlap so the entity resolver can compare evidence.
+    queries = [
+        "AI data center optical interconnect semiconductor",
+        "silicon photonics CPO AI infrastructure",
+        "GPU optical interconnect order partnership production",
+        "半導体 AI データセンター 光通信 受注 提携",
+    ]
+    seen = set()
+    news = []
+    for q in queries:
+        try:
+            items = google_news(q)
+        except Exception:
+            items = []
+        for x in items:
+            key = (x["title"], x["url"])
+            if key not in seen:
+                seen.add(key)
+                news.append(x)
+
+    rows = []
+    for item in news:
+        company, conf, involvement = resolve_entity(item["title"], item["summary"])
+        mats = material_type(item["title"], item["summary"])
+        theme = theme_of(item["title"], item["summary"])
+        progress = business_progress_score(mats, conf, theme)
+
+        ticker = company.ticker if company and conf >= CONFIG["min_entity_confidence"] else ""
+        price_1d = price_5d = price_20d = None
+        if ticker:
+            reactions = price_reaction(ticker, item["published"])
+            price_1d, price_5d, price_20d = reactions.get("1D"), reactions.get("5D"), reactions.get("20D")
+
+        fin = financial_snapshot(company) if company and conf >= CONFIG["min_entity_confidence"] else {}
+        fields = [ticker, price_1d, price_5d, fin.get("株価"), fin.get("時価総額"),
+                  fin.get("PER"), fin.get("PBR"), fin.get("PSR"), fin.get("EPS"),
+                  fin.get("売上成長率"), fin.get("営業利益成長率"), fin.get("営業CF")]
+        dq = data_quality(fields)
+        valuation_status = fin.get("バリュエーション整合性", "CHECK_REQUIRED")
+        gap = implied_gap(progress, price_1d, price_5d, valuation_status, dq)
+        rows.append({
+            "取得日": TODAY,
+            "企業": company.name if company and conf >= CONFIG["min_entity_confidence"] else "未特定",
+            "証券コード・ティッカー": ticker,
+            "企業関与": involvement,
+            "企業関与信頼度": round(conf, 2),
+            "テーマ": theme,
+            "材料": " / ".join(mats) if mats else "テーマ関連",
+            "事業進展スコア": progress,
+            "株価反応1日": price_1d,
+            "株価反応5日": price_5d,
+            "株価反応20日": price_20d,
+            "未織り込みギャップ": gap,
+            "株価": fin.get("株価"),
+            "時価総額": fin.get("時価総額"),
+            "PER": fin.get("PER"),
+            "PBR": fin.get("PBR"),
+            "PSR": fin.get("PSR"),
+            "EV/EBITDA": fin.get("EV/EBITDA"),
+            "EPS": fin.get("EPS"),
+            "EPS成長率": fin.get("EPS成長率"),
+            "EPS成長判定": fin.get("EPS成長判定", "NA"),
+            "売上成長率": fin.get("売上成長率"),
+            "営業利益成長率": fin.get("営業利益成長率"),
+            "ROE": fin.get("ROE"),
+            "ROIC": fin.get("ROIC"),
+            "営業CF": fin.get("営業CF"),
+            "FCF": fin.get("FCF"),
+            "配当利回り": fin.get("配当利回り"),
+            "配当性向": fin.get("配当性向"),
+            "利益品質": fin.get("利益品質", "未判定"),
+            "バリュエーション整合性": fin.get("バリュエーション整合性", "CHECK_REQUIRED"),
+            "データ品質": dq,
+            "データ基準日": fin.get("データ基準日", ""),
+            "決算期": fin.get("決算期", ""),
+            "指標基準": fin.get("指標基準", ""),
+            "取得元": "; ".join(x for x in ["Google News RSS", fin.get("取得元", "Yahoo chart")] if x),
+            "整合性チェック": fin.get("整合性チェック", "財務データ未取得"),
+            "リスク": ("利益品質:" + str(fin.get("利益品質")) if fin.get("利益品質") not in (None, "暫定良好", "未判定") else ("財務データ未取得" if ticker else "企業未特定")),
+            "タイトル": item["title"],
+            "公開日時": item["published"],
+            "URL": item["url"],
+        })
+
+    df = pd.DataFrame(rows)
+    if df.empty:
+        df = pd.DataFrame([{"取得日": TODAY, "企業": "データなし"}])
+
+    # No ranking by raw news volume. Sort by the research signal only.
+    sort_cols = [c for c in ["未織り込みギャップ", "事業進展スコア", "企業関与信頼度"] if c in df]
+    if sort_cols:
+        df = df.sort_values(sort_cols, ascending=False)
+
+    out = DATA / f"radar_{TODAY}.csv"
+    df.to_csv(out, index=False, encoding="utf-8-sig")
+
+    candidates = (
+        df[(df["企業"] != "未特定") & (df["企業関与信頼度"] >= CONFIG["min_entity_confidence"])]
+        .groupby(["企業", "証券コード・ティッカー"], as_index=False)
+        .agg(
+            未織り込みギャップ=("未織り込みギャップ", "max"),
+            事業進展スコア=("事業進展スコア", "max"),
+            材料件数=("材料", "count"),
+            データ品質=("データ品質", "max"),
+            テーマ=("テーマ", lambda x: " / ".join(sorted(set(x)))),
+        )
+        .sort_values(["未織り込みギャップ", "事業進展スコア"], ascending=False)
+        .head(30)
+    )
+
+    md = [
+        f"# Future Stock Radar v4 — {TODAY}",
+        "",
+        "> 調査優先度を示す研究用レーダーです。売買推奨・将来リターン保証ではありません。",
+        "",
+        "## 設計思想",
+        "事業進展の強さと、直近の株価反応・バリュエーション・データ品質を分離して評価します。",
+        "",
+        "## 調査候補",
+    ]
+    for i, r in candidates.reset_index(drop=True).iterrows():
+        md += [
+            f"### {i+1}. {r['企業']}（{r['証券コード・ティッカー']}）",
+            f"- 未織り込みギャップ：{r['未織り込みギャップ']}",
+            f"- 事業進展スコア：{r['事業進展スコア']}",
+            f"- 材料件数：{r['材料件数']}",
+            f"- データ品質：{r['データ品質']}%",
+            f"- テーマ：{r['テーマ']}",
+            "",
+        ]
+
+    (DATA / f"top_candidates_{TODAY}.md").write_text("\n".join(md), encoding="utf-8")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
