@@ -1,0 +1,17 @@
+{
+  "timezone": "Asia/Tokyo",
+  "max_news_items": 500,
+  "min_entity_confidence": 0.72,
+  "valuation_consistency_tolerance": 0.08,
+  "candidate_score_cap_without_financials": 45,
+  "small_cap_jpy": 300000000000,
+  "small_cap_usd": 30000000000,
+  "sources": {
+    "google_news_rss": true,
+    "yahoo_finance": true
+  },
+  "watchlists": {
+    "US": ["NVDA","AMD","AVGO","MRVL","COHR","LITE","AMAT","AMKR","CSCO","INTC","EQIX","AEHR","GLW"],
+    "JP": ["285A","6857","6971","9432","6723","6501","6503","7011","3133","3444","4392","6888"]
+  }
+}
