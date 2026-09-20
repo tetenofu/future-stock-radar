@@ -1,7 +1,8 @@
-name: Daily Future Stock Radar
+name: Daily Future Stock Radar v4
 
 on:
   schedule:
+    # 07:17 JST = 22:17 UTC (previous day)
     - cron: "17 22 * * *"
   workflow_dispatch:
 
@@ -15,8 +16,6 @@ concurrency:
 jobs:
   radar:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
