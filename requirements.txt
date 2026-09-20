@@ -1,2 +1,6 @@
-feedparser==6.0.11
-yfinance>=0.2.66,<0.3
+pandas>=2.2,<3
+requests>=2.32,<3
+feedparser>=6.0,<7
+beautifulsoup4>=4.12,<5
+python-dateutil>=2.9,<3
+yfinance>=0.2.66,<1
