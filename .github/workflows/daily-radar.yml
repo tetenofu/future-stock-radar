@@ -28,10 +28,30 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Validate radar files
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          required = [Path("radar.py"), Path("config.json"), Path("requirements.txt")]
+          missing = [str(p) for p in required if not p.exists()]
+          if missing:
+              raise SystemExit("Missing required files: " + ", ".join(missing))
+          print("Required files OK")
+          PY
+
       - name: Run radar
         run: python radar.py
 
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: future-stock-radar-diagnostics
+          path: data/
+          if-no-files-found: ignore
+
       - name: Save results
+        if: success()
         run: |
           git config user.name "future-stock-radar[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
