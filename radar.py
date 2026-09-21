@@ -5,6 +5,7 @@ import json
 import math
 import re
 import time
+import traceback
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -174,11 +175,13 @@ def google_news(company_query="AI data center optical interconnect"):
     return out
 
 
-def yahoo_chart(ticker):
-    # Public chart endpoint. If unavailable, return None rather than inventing data.
+def yahoo_chart(ticker, period="6mo", interval="1d"):
+    # Public chart endpoint. Explicit range keeps enough history for 1D/5D/20D event reactions.
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}"
+    params = {"range": period, "interval": interval, "events": "history", "includeAdjustedClose": "true"}
     try:
-        r = fetch(url, 20)
+        r = requests.get(url, params=params, headers={"User-Agent": UA}, timeout=20)
+        r.raise_for_status()
         j = r.json()["chart"]["result"][0]
         meta = j.get("meta", {})
         timestamps = j.get("timestamp") or []
@@ -193,7 +196,9 @@ def yahoo_chart(ticker):
 
 
 def price_reaction(ticker, event_date):
-    c = yahoo_chart(ticker)
+    if not event_date or len(event_date) < 10:
+        return {}
+    c = get_chart(ticker)
     if not c:
         return {}
     _, rows = c
@@ -392,7 +397,10 @@ def financial_snapshot(company: Company):
             divs = tk.dividends
             if divs is not None and not divs.empty and price:
                 one_year_ago = pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=366)
-                annual_div = float(divs[divs.index >= one_year_ago]["Dividends"].sum())
+                idx = divs.index
+                if getattr(idx, "tz", None) is None:
+                    idx = idx.tz_localize("UTC")
+                annual_div = float(divs.loc[idx >= one_year_ago].sum())
                 dividend_yield = annual_div / price * 100
                 payout = safe_ratio(annual_div, eps) * 100 if eps and eps > 0 else None
         except Exception:
@@ -442,39 +450,58 @@ def financial_snapshot(company: Company):
             checks.append(abs(pbr - price / bps) / max(abs(pbr), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
         integrity = "OK" if checks and all(checks) else ("⚠要確認" if checks else "DATA_UNAVAILABLE")
 
+        op_margin = safe_ratio(op_profit, revenue) * 100 if revenue else None
+        net_margin = safe_ratio(net_income, revenue) * 100 if revenue else None
+        debt_to_equity = safe_ratio(debt, equity) * 100 if equity else None
+        net_cash = (cash_eq - debt) if cash_eq is not None and debt is not None else None
+
         return {
-            "株価": price,
-            "時価総額": market_cap,
-            "PER": per,
-            "PBR": pbr,
-            "PSR": psr,
-            "EV/EBITDA": ev_ebitda,
-            "EPS": eps,
-            "EPS成長率": eps_growth,
-            "EPS成長判定": growth_class(eps, eps_prev),
-            "売上": revenue,
-            "売上成長率": rev_growth,
-            "営業利益": op_profit,
-            "営業利益成長率": op_growth,
-            "ROE": (roe * 100 if roe is not None else None),
-            "ROIC": (roic * 100 if roic is not None else None),
-            "営業CF": cfo,
-            "FCF": fcf,
-            "配当利回り": dividend_yield,
-            "配当性向": payout,
-            "利益品質": quality,
-            "バリュエーション整合性": integrity,
-            "データ基準日": datetime.now(JST).date().isoformat(),
+            "財務取得状態": "OK",
+            "株価": price, "時価総額": market_cap, "PER": per, "PBR": pbr, "PSR": psr, "EV/EBITDA": ev_ebitda,
+            "EPS": eps, "EPS前期": eps_prev, "EPS成長率": eps_growth, "EPS成長判定": growth_class(eps, eps_prev),
+            "売上": revenue, "売上前期": revenue_prev, "売上成長率": rev_growth,
+            "営業利益": op_profit, "営業利益前期": op_profit_prev, "営業利益成長率": op_growth, "営業利益率": op_margin,
+            "純利益": net_income, "純利益前期": net_income_prev, "純利益率": net_margin, "BPS": bps,
+            "株主資本": equity, "総資産": assets, "現金等": cash_eq, "有利子負債": debt,
+            "ネットキャッシュ": net_cash, "負債/株主資本": debt_to_equity,
+            "ROE": (roe * 100 if roe is not None else None), "ROIC": (roic * 100 if roic is not None else None),
+            "営業CF": cfo, "FCF": fcf, "配当利回り": dividend_yield, "配当性向": payout,
+            "一時要因": " / ".join(oneoff) if oneoff else "検出なし", "利益品質": quality,
+            "バリュエーション整合性": integrity, "データ基準日": datetime.now(JST).date().isoformat(),
             "決算期": str(latest.date()) if hasattr(latest, "date") else str(latest),
-            "指標基準": "直近年次決算ベース（株価のみ最新）",
-            "取得元": "Yahoo Finance/yfinance",
-            "整合性チェック": integrity,
+            "指標基準": "直近年次決算ベース（株価のみ最新）", "取得元": "Yahoo Finance/yfinance", "整合性チェック": integrity,
         }
     except Exception as e:
         return {
+            "財務取得状態": "DATA_UNAVAILABLE",
             "取得元": "Yahoo Finance/yfinance",
             "整合性チェック": f"DATA_UNAVAILABLE:{type(e).__name__}"
         }
+
+_FIN_CACHE = {}
+_CHART_CACHE = {}
+def get_financial_snapshot(company):
+    key = company.ticker if company else ""
+    if not key:
+        return {}
+    if key not in _FIN_CACHE:
+        _FIN_CACHE[key] = financial_snapshot(company)
+    return _FIN_CACHE[key]
+
+def get_chart(ticker):
+    if ticker not in _CHART_CACHE:
+        _CHART_CACHE[ticker] = yahoo_chart(ticker, period=CONFIG.get("chart_period", "6mo"), interval="1d")
+    return _CHART_CACHE[ticker]
+
+def market_cap_bucket(company, market_cap):
+    if market_cap is None or company is None:
+        return "NA"
+    limit = CONFIG["small_cap_jpy"] if company.market == "JP" else CONFIG["small_cap_usd"]
+    if market_cap < limit:
+        return "小型〜中小型"
+    if market_cap < limit * 5:
+        return "中型"
+    return "大型"
 
 def main():
     # Broad queries intentionally overlap so the entity resolver can compare evidence.
@@ -510,17 +537,22 @@ def main():
             reactions = price_reaction(ticker, item["published"])
             price_1d, price_5d, price_20d = reactions.get("1D"), reactions.get("5D"), reactions.get("20D")
 
-        fin = financial_snapshot(company) if company and conf >= CONFIG["min_entity_confidence"] else {}
-        fields = [ticker, price_1d, price_5d, fin.get("株価"), fin.get("時価総額"),
-                  fin.get("PER"), fin.get("PBR"), fin.get("PSR"), fin.get("EPS"),
-                  fin.get("売上成長率"), fin.get("営業利益成長率"), fin.get("営業CF")]
+        fin = get_financial_snapshot(company) if company and conf >= CONFIG["min_entity_confidence"] else {}
+        fields = [ticker, price_1d, price_5d, price_20d, fin.get("株価"), fin.get("時価総額"),
+                  fin.get("PER"), fin.get("PBR"), fin.get("PSR"), fin.get("EV/EBITDA"), fin.get("EPS"),
+                  fin.get("売上成長率"), fin.get("営業利益成長率"), fin.get("ROE"), fin.get("ROIC"),
+                  fin.get("営業CF"), fin.get("FCF"), fin.get("配当利回り"), fin.get("配当性向")]
         dq = data_quality(fields)
         valuation_status = fin.get("バリュエーション整合性", "CHECK_REQUIRED")
         gap = implied_gap(progress, price_1d, price_5d, valuation_status, dq)
+        if ticker and fin.get("財務取得状態") != "OK":
+            gap = min(gap, CONFIG["candidate_score_cap_without_financials"])
         rows.append({
             "取得日": TODAY,
             "企業": company.name if company and conf >= CONFIG["min_entity_confidence"] else "未特定",
+            "市場": company.market if company and ticker else "",
             "証券コード・ティッカー": ticker,
+            "企業規模区分": market_cap_bucket(company, fin.get("時価総額")) if ticker else "NA",
             "企業関与": involvement,
             "企業関与信頼度": round(conf, 2),
             "テーマ": theme,
@@ -537,19 +569,35 @@ def main():
             "PSR": fin.get("PSR"),
             "EV/EBITDA": fin.get("EV/EBITDA"),
             "EPS": fin.get("EPS"),
+            "EPS前期": fin.get("EPS前期"),
             "EPS成長率": fin.get("EPS成長率"),
             "EPS成長判定": fin.get("EPS成長判定", "NA"),
+            "売上": fin.get("売上"),
+            "売上前期": fin.get("売上前期"),
             "売上成長率": fin.get("売上成長率"),
+            "営業利益": fin.get("営業利益"),
+            "営業利益前期": fin.get("営業利益前期"),
             "営業利益成長率": fin.get("営業利益成長率"),
+            "営業利益率": fin.get("営業利益率"),
+            "純利益": fin.get("純利益"),
+            "純利益前期": fin.get("純利益前期"),
+            "純利益率": fin.get("純利益率"),
+            "BPS": fin.get("BPS"),
             "ROE": fin.get("ROE"),
             "ROIC": fin.get("ROIC"),
             "営業CF": fin.get("営業CF"),
             "FCF": fin.get("FCF"),
+            "現金等": fin.get("現金等"),
+            "有利子負債": fin.get("有利子負債"),
+            "ネットキャッシュ": fin.get("ネットキャッシュ"),
+            "負債/株主資本": fin.get("負債/株主資本"),
+            "一時要因": fin.get("一時要因", "NA"),
             "配当利回り": fin.get("配当利回り"),
             "配当性向": fin.get("配当性向"),
             "利益品質": fin.get("利益品質", "未判定"),
             "バリュエーション整合性": fin.get("バリュエーション整合性", "CHECK_REQUIRED"),
             "データ品質": dq,
+            "財務取得状態": fin.get("財務取得状態", "DATA_UNAVAILABLE" if ticker else "未取得"),
             "データ基準日": fin.get("データ基準日", ""),
             "決算期": fin.get("決算期", ""),
             "指標基準": fin.get("指標基準", ""),
@@ -584,27 +632,83 @@ def main():
             テーマ=("テーマ", lambda x: " / ".join(sorted(set(x)))),
         )
         .sort_values(["未織り込みギャップ", "事業進展スコア"], ascending=False)
-        .head(30)
+        .head(int(CONFIG.get("max_candidates", 30)))
     )
 
+    # One representative row per company: strongest signal, while retaining full detail.
+    candidates = df[(df["企業"] != "未特定") & (df["企業関与信頼度"] >= CONFIG["min_entity_confidence"])].copy()
+    if not candidates.empty:
+        candidates = candidates.sort_values(["未織り込みギャップ", "事業進展スコア", "データ品質"], ascending=False)
+        rep = candidates.drop_duplicates(["企業", "証券コード・ティッカー"], keep="first").head(int(CONFIG.get("max_candidates", 30)))
+    else:
+        rep = candidates
+
     md = [
-        f"# Future Stock Radar v4 — {TODAY}",
+        f"# Future Stock Radar v4.1 — {TODAY}",
         "",
         "> 調査優先度を示す研究用レーダーです。売買推奨・将来リターン保証ではありません。",
         "",
-        "## 設計思想",
-        "事業進展の強さと、直近の株価反応・バリュエーション・データ品質を分離して評価します。",
+        "## v4.1 ブラッシュアップ内容",
+        "- v4の既存項目を削らず、候補レポート側にも詳細財務を展開。",
+        "- 株価履歴の取得期間を明示し、1D/5D/20D反応を実測。",
+        "- 配当履歴をSeriesとして正しく集計し、配当利回り・配当性向を復元。",
+        "- 同一企業の財務データをニュースごとに再取得せずキャッシュ。",
+        "- 財務データ未取得の候補は未織り込みギャップを上限値で抑制。",
+        "- 一時要因、営業利益率、純利益、BPS、現金、有利子負債、ネットキャッシュ等を追加。",
+        "",
+        "## 読み方",
+        "- 未織り込みギャップは、事業進展と直近株価反応の差をみる内部研究指標であり、将来リターン予測ではありません。",
+        "- 株価反応は材料公開日を基準にした翌1/5/20取引日の変化率です。",
+        "- 欠損値は推測で補完せずNAとします。",
         "",
         "## 調査候補",
     ]
-    for i, r in candidates.reset_index(drop=True).iterrows():
+    def fmt(v, digits=2):
+        if v is None or (isinstance(v, float) and math.isnan(v)):
+            return "NA"
+        if isinstance(v, (int, float)):
+            return f"{v:,.{digits}f}"
+        return str(v)
+    def pctfmt(v):
+        return "NA" if v is None or (isinstance(v, float) and math.isnan(v)) else f"{v:.2f}%"
+
+    for i, (_, r) in enumerate(rep.iterrows(), 1):
         md += [
-            f"### {i+1}. {r['企業']}（{r['証券コード・ティッカー']}）",
-            f"- 未織り込みギャップ：{r['未織り込みギャップ']}",
-            f"- 事業進展スコア：{r['事業進展スコア']}",
-            f"- 材料件数：{r['材料件数']}",
-            f"- データ品質：{r['データ品質']}%",
-            f"- テーマ：{r['テーマ']}",
+            f"### {i}. {r['企業']}（{r['証券コード・ティッカー']}）",
+            f"- 未織り込みギャップ：{fmt(r['未織り込みギャップ'], 1)} / 事業進展：{fmt(r['事業進展スコア'], 0)} / データ品質：{pctfmt(r['データ品質'])}",
+            f"- 材料：{r['材料']}",
+            f"- テーマ：{r['テーマ']} / 企業関与信頼度：{fmt(r['企業関与信頼度'])}",
+            "",
+            "**株価・バリュエーション**",
+            f"- 株価：{fmt(r['株価'])} / 時価総額：{fmt(r['時価総額'])} / 規模区分：{r['企業規模区分']}",
+            f"- PER：{fmt(r['PER'])} / PBR：{fmt(r['PBR'])} / PSR：{fmt(r['PSR'])} / EV/EBITDA：{fmt(r['EV/EBITDA'])}",
+            f"- 株価反応：1D {pctfmt(r['株価反応1日'])} / 5D {pctfmt(r['株価反応5日'])} / 20D {pctfmt(r['株価反応20日'])}",
+            f"- バリュエーション整合性：{r['バリュエーション整合性']}",
+            "",
+            "**成長・収益性・キャッシュフロー**",
+            f"- EPS：{fmt(r['EPS'])} / 前期：{fmt(r['EPS前期'])} / 成長率：{pctfmt(r['EPS成長率'])} / 判定：{r['EPS成長判定']}",
+            f"- 売上：{fmt(r['売上'])} / 前期：{fmt(r['売上前期'])} / 成長率：{pctfmt(r['売上成長率'])}",
+            f"- 営業利益：{fmt(r['営業利益'])} / 成長率：{pctfmt(r['営業利益成長率'])} / 営業利益率：{pctfmt(r['営業利益率'])}",
+            f"- 純利益：{fmt(r['純利益'])} / 純利益率：{pctfmt(r['純利益率'])}",
+            f"- ROE：{pctfmt(r['ROE'])} / ROIC：{pctfmt(r['ROIC'])}",
+            f"- 営業CF：{fmt(r['営業CF'])} / FCF：{fmt(r['FCF'])}",
+            "",
+            "**財務安全性・利益品質**",
+            f"- BPS：{fmt(r['BPS'])}",
+            f"- 現金等：{fmt(r['現金等'])} / 有利子負債：{fmt(r['有利子負債'])} / ネットキャッシュ：{fmt(r['ネットキャッシュ'])}",
+            f"- 負債/株主資本：{pctfmt(r['負債/株主資本'])}",
+            f"- 一時要因：{r['一時要因']} / 利益品質：{r['利益品質']}",
+            f"- 配当利回り：{pctfmt(r['配当利回り'])} / 配当性向：{pctfmt(r['配当性向'])}",
+            "",
+            "**データ基準**",
+            f"- 財務取得状態：{r['財務取得状態']}",
+            f"- データ基準日：{r['データ基準日']} / 決算期：{r['決算期']}",
+            f"- 指標基準：{r['指標基準']}",
+            f"- 取得元：{r['取得元']} / 整合性：{r['整合性チェック']}",
+            f"- リスク表示：{r['リスク']}",
+            f"- 代表材料：{r['タイトル']}",
+            f"- 公開日時：{r['公開日時']}",
+            f"- 出典：{r['URL']}",
             "",
         ]
 
@@ -612,4 +716,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        (DATA / f"run_error_{TODAY}.txt").write_text(traceback.format_exc(), encoding="utf-8")
+        raise
