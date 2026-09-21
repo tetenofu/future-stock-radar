@@ -11,7 +11,37 @@
     "yahoo_finance": true
   },
   "watchlists": {
-    "US": ["NVDA","AMD","AVGO","MRVL","COHR","LITE","AMAT","AMKR","CSCO","INTC","EQIX","AEHR","GLW"],
-    "JP": ["285A","6857","6971","9432","6723","6501","6503","7011","3133","3444","4392","6888"]
-  }
+    "US": [
+      "NVDA",
+      "AMD",
+      "AVGO",
+      "MRVL",
+      "COHR",
+      "LITE",
+      "AMAT",
+      "AMKR",
+      "CSCO",
+      "INTC",
+      "EQIX",
+      "AEHR",
+      "GLW"
+    ],
+    "JP": [
+      "285A",
+      "6857",
+      "6971",
+      "9432",
+      "6723",
+      "6501",
+      "6503",
+      "7011",
+      "3133",
+      "3444",
+      "4392",
+      "6888"
+    ]
+  },
+  "version": "4.1",
+  "chart_period": "6mo",
+  "max_candidates": 30
 }
