@@ -25,7 +25,56 @@ DATA.mkdir(exist_ok=True)
 CONFIG = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
 JST = ZoneInfo(CONFIG["timezone"])
 TODAY = datetime.now(JST).date().isoformat()
-UA = "future-stock-radar/4.2 (+https://github.com/)"
+UA = "future-stock-radar/4.3 (+https://github.com/)"
+
+# CSV/report contract. Every field referenced by the Markdown renderer must
+# exist in every output row, even when its value is NA. This prevents the
+# v4.2 failure where EPS_直近年度 was referenced by the report but absent
+# from the DataFrame.
+OUTPUT_COLUMNS = [
+    "取得日", "企業", "市場", "証券コード・ティッカー", "企業規模区分",
+    "企業関与", "企業関与信頼度", "テーマ", "材料", "事業進展スコア",
+    "株価反応1日", "株価反応5日", "株価反応20日", "未織り込みギャップ",
+    "通貨", "株価", "株価表示", "時価総額", "時価総額表示",
+    "PER", "PBR", "PSR", "EV/EBITDA", "PER_TTM", "PSR_TTM",
+    "EV/EBITDA_TTM", "PER_直近年度", "TTM基準日",
+    "EPS", "EPS_直近年度", "EPS_直近年度前期", "EPS前期", "EPS成長率", "EPS成長判定",
+    "売上", "売上前期", "売上成長率", "営業利益", "営業利益前期",
+    "営業利益成長率", "営業利益率", "純利益", "純利益前期", "純利益率",
+    "BPS", "ROE", "ROIC", "営業CF", "FCF", "現金等", "有利子負債",
+    "ネットキャッシュ", "負債/株主資本", "一時要因", "配当利回り", "配当性向",
+    "利益品質", "バリュエーション整合性", "データ品質", "財務取得状態",
+    "データ基準日", "決算期", "指標基準", "取得元", "整合性チェック",
+    "数値警告", "リスク", "タイトル", "公開日時", "URL",
+]
+
+
+def validate_output_schema(df: pd.DataFrame):
+    missing = [c for c in OUTPUT_COLUMNS if c not in df.columns]
+    if missing:
+        raise RuntimeError("Output schema mismatch. Missing columns: " + ", ".join(missing))
+    # Report columns must be unique too; duplicate columns can make pandas
+    # row access return a Series and silently corrupt formatting.
+    dup = df.columns[df.columns.duplicated()].tolist()
+    if dup:
+        raise RuntimeError("Output schema mismatch. Duplicate columns: " + ", ".join(dup))
+    return True
+
+
+def validate_numeric_sanity(df: pd.DataFrame):
+    issues = []
+    numeric_cols = [
+        "株価", "時価総額", "PER", "PBR", "PSR", "EV/EBITDA", "EPS",
+        "EPS_直近年度", "EPS_直近年度前期", "売上", "営業利益", "純利益",
+        "BPS", "ROE", "ROIC", "営業CF", "FCF", "現金等", "有利子負債",
+    ]
+    for col in numeric_cols:
+        if col not in df.columns:
+            continue
+        for idx, value in df[col].items():
+            if isinstance(value, (int, float)) and not math.isfinite(float(value)):
+                issues.append(f"row={idx}:{col}=非有限値")
+    return issues
 
 
 def na(v):
@@ -308,13 +357,19 @@ def _sum_last_four_quarters(df, names):
     if df is None or df.empty:
         return None, None
     cols = list(df.columns)[:4]
+    # Fewer than four quarterly periods is not a valid TTM. Returning NA is
+    # preferable to accidentally summing annual periods and labeling them TTM.
+    if len(cols) < 4:
+        return None, None
     vals = []
     for col in cols:
         v = _statement_value(df, names, col)
         if v is None:
             return None, None
         vals.append(v)
-    return sum(vals), cols[-1]
+    # yfinance normally orders newest quarter first; the first column is the
+    # latest reported period and therefore the correct TTM as-of date.
+    return sum(vals), cols[0]
 
 
 def _period_label(col):
@@ -360,12 +415,16 @@ def financial_snapshot(company: Company):
         balance = tk.balance_sheet
         cash = tk.cashflow
 
-        if q_income is None or q_income.empty:
-            q_income = income
+        # Do not silently substitute annual statements for TTM calculations.
+        # Annual data is retained for annual comparisons; TTM requires four
+        # actual quarterly periods. Balance sheet may fall back to the latest
+        # available statement, but its basis is explicitly labeled below.
+        if q_income is None:
+            q_income = pd.DataFrame()
         if q_balance is None or q_balance.empty:
             q_balance = balance
-        if q_cash is None or q_cash.empty:
-            q_cash = cash
+        if q_cash is None:
+            q_cash = pd.DataFrame()
         if income is None or income.empty:
             return {"財務取得状態": "DATA_UNAVAILABLE", "取得元": "Yahoo Finance/yfinance", "整合性チェック": "DATA_UNAVAILABLE"}
 
@@ -390,14 +449,15 @@ def financial_snapshot(company: Company):
         eps, _ = _sum_last_four_quarters(q_income, ["Diluted EPS", "Basic EPS"])
         ebitda, _ = _sum_last_four_quarters(q_income, ["EBITDA", "Normalized EBITDA"])
 
-        if eps is None and net_income is not None:
-            shares = _statement_value(q_income, ["Diluted Average Shares", "Basic Average Shares"], list(q_income.columns)[0]) if not q_income.empty else None
-            eps = safe_ratio(net_income, shares)
+        # Do not derive TTM EPS from one quarter's share count. If the four
+        # quarterly EPS observations are unavailable, leave TTM EPS as NA.
 
         # Latest available balance sheet (prefer quarterly / MRQ).
-        bs_cols = list(q_balance.columns) if q_balance is not None and not q_balance.empty else list(balance.columns)
+        using_quarterly_bs = q_balance is not None and not q_balance.empty and q_balance is not balance
+        bs_cols = list(q_balance.columns) if q_balance is not None and not q_balance.empty else []
         latest_bs = bs_cols[0] if bs_cols else None
         previous_bs = bs_cols[1] if len(bs_cols) > 1 else None
+        bs_basis = "最新四半期" if using_quarterly_bs else "最新入手BS（四半期データなしの場合は年次）"
         equity = _statement_value(q_balance, ["Stockholders Equity", "Common Stock Equity", "Total Equity Gross Minority Interest"], latest_bs)
         equity_prev = _statement_value(q_balance, ["Stockholders Equity", "Common Stock Equity", "Total Equity Gross Minority Interest"], previous_bs)
         cash_eq = _statement_value(q_balance, ["Cash Cash Equivalents And Short Term Investments", "Cash And Cash Equivalents", "Cash Financial"], latest_bs)
@@ -503,6 +563,8 @@ def financial_snapshot(company: Company):
 
         # Detect mathematically valid but analytically misleading values.
         warnings = []
+        if revenue is None or eps is None or op_profit is None or net_income is None:
+            warnings.append("TTM算出に必要な4四半期データ不足・一部NA")
         if eps is not None and eps < 0: warnings.append("TTM EPS赤字")
         if eps is not None and eps > 0 and eps_growth is None and annual_eps_prev is not None: warnings.append("EPS成長率比較不能")
         if roe is not None and abs(roe) > 1: warnings.append("ROE絶対値100%超・要因確認")
@@ -528,7 +590,7 @@ def financial_snapshot(company: Company):
             "一時要因": " / ".join(oneoff) if oneoff else "検出なし", "利益品質": quality,
             "バリュエーション整合性": integrity, "データ基準日": datetime.now(JST).date().isoformat(),
             "決算期": _period_label(latest_bs), "TTM基準日": _period_label(ttm_end) if ttm_end else "",
-            "指標基準": "PER/PSR/EV/EBITDA=TTM、PBR/BPS/現金/負債=最新四半期、成長率=直近年度比較",
+            "指標基準": f"PER/PSR/EV/EBITDA=TTM（4四半期揃わない場合NA）、PBR/BPS/現金/負債={bs_basis}、成長率=直近年度比較",
             "取得元": "Yahoo Finance/yfinance", "整合性チェック": integrity,
             "数値警告": " / ".join(warnings) if warnings else "なし",
         }
@@ -636,6 +698,8 @@ def main():
             "PER_直近年度": fin.get("PER_直近年度"),
             "TTM基準日": fin.get("TTM基準日", ""),
             "EPS": fin.get("EPS"),
+            "EPS_直近年度": fin.get("EPS_直近年度"),
+            "EPS_直近年度前期": fin.get("EPS_直近年度前期"),
             "EPS前期": fin.get("EPS前期"),
             "EPS成長率": fin.get("EPS成長率"),
             "EPS成長判定": fin.get("EPS成長判定", "NA"),
@@ -680,6 +744,16 @@ def main():
     df = pd.DataFrame(rows)
     if df.empty:
         df = pd.DataFrame([{"取得日": TODAY, "企業": "データなし"}])
+        for col in OUTPUT_COLUMNS:
+            if col not in df.columns:
+                df[col] = pd.NA
+
+    # Hard contract: fail before writing any output if the CSV/report schema
+    # is inconsistent. This is intentionally a release-blocking check.
+    validate_output_schema(df)
+    schema_numeric_issues = validate_numeric_sanity(df)
+    if schema_numeric_issues:
+        raise RuntimeError("Numeric sanity check failed: " + "; ".join(schema_numeric_issues[:20]))
 
     # No ranking by raw news volume. Sort by the research signal only.
     sort_cols = [c for c in ["未織り込みギャップ", "事業進展スコア", "企業関与信頼度"] if c in df]
@@ -704,6 +778,10 @@ def main():
             expected = rr["株価"] / rr["BPS"]
             if abs(expected - rr["PBR"]) / max(abs(rr["PBR"]), 1e-9) > CONFIG["valuation_consistency_tolerance"]:
                 checks.append("PBR再計算不一致")
+        if rr.get("PER_直近年度") is not None and rr.get("EPS_直近年度") not in (None, 0) and rr.get("株価") is not None:
+            expected = rr["株価"] / rr["EPS_直近年度"]
+            if abs(expected - rr["PER_直近年度"]) / max(abs(rr["PER_直近年度"]), 1e-9) > CONFIG["valuation_consistency_tolerance"]:
+                checks.append("直近年度PER再計算不一致")
         if rr.get("EPS成長判定") in ("赤字→黒字転換", "黒字→赤字転落", "赤字継続") and rr.get("EPS成長率") is not None:
             checks.append("成長率分類と数値の不整合")
         if rr.get("数値警告") not in (None, "", "なし"):
@@ -711,7 +789,7 @@ def main():
         if checks:
             diagnostics.append({"企業": rr.get("企業"), "ticker": rr.get("証券コード・ティッカー"), "問題": " / ".join(dict.fromkeys(checks))})
     diag_path = DATA / f"data_quality_{TODAY}.json"
-    diag_path.write_text(json.dumps({"version":"4.2","date":TODAY,"status":"PASS_WITH_WARNINGS" if diagnostics else "PASS","issues":diagnostics}, ensure_ascii=False, indent=2), encoding="utf-8")
+    diag_path.write_text(json.dumps({"version":"4.3","date":TODAY,"status":"PASS_WITH_WARNINGS" if diagnostics else "PASS","issues":diagnostics}, ensure_ascii=False, indent=2), encoding="utf-8")
 
     out = DATA / f"radar_{TODAY}.csv"
     df.to_csv(out, index=False, encoding="utf-8-sig")
@@ -739,11 +817,11 @@ def main():
         rep = candidates
 
     md = [
-        f"# Future Stock Radar v4.2 — {TODAY}",
+        f"# Future Stock Radar v4.3 — {TODAY}",
         "",
         "> 調査優先度を示す研究用レーダーです。売買推奨・将来リターン保証ではありません。",
         "",
-        "## v4.2 ブラッシュアップ内容",
+        "## v4.3 ブラッシュアップ内容",
         "- v4.1の項目を維持し、TTM/最新四半期/年度比較の基準を分離。",
         "- 株価履歴の取得期間を明示し、1D/5D/20D反応を実測。",
         "- 配当履歴をSeriesとして正しく集計し、配当利回り・配当性向を復元。",
