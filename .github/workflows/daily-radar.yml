@@ -1,4 +1,4 @@
-name: Daily Future Stock Radar v4
+name: Daily Future Stock Radar v4.2
 
 on:
   schedule:
@@ -46,7 +46,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: future-stock-radar-diagnostics
+          name: future-stock-radar-diagnostics-v4.2
           path: data/
           if-no-files-found: ignore
 
