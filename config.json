@@ -41,7 +41,8 @@
       "6888"
     ]
   },
-  "version": "4.1",
+  "version": "4.2",
   "chart_period": "6mo",
-  "max_candidates": 30
+  "max_candidates": 30,
+  "diagnostics": true
 }
