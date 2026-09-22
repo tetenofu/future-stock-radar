@@ -1,4 +1,4 @@
-name: Daily Future Stock Radar v4.2
+name: Daily Future Stock Radar v4.3
 
 on:
   schedule:
@@ -39,6 +39,9 @@ jobs:
           print("Required files OK")
           PY
 
+      - name: Run preflight tests
+        run: python -m unittest discover -s tests -v
+
       - name: Run radar
         run: python radar.py
 
@@ -46,7 +49,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: future-stock-radar-diagnostics-v4.2
+          name: future-stock-radar-diagnostics-v4.3
           path: data/
           if-no-files-found: ignore
 
