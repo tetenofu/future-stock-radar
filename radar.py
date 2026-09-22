@@ -25,7 +25,7 @@ DATA.mkdir(exist_ok=True)
 CONFIG = json.loads((ROOT / "config.json").read_text(encoding="utf-8"))
 JST = ZoneInfo(CONFIG["timezone"])
 TODAY = datetime.now(JST).date().isoformat()
-UA = "future-stock-radar/4.0 (+https://github.com/)"
+UA = "future-stock-radar/4.2 (+https://github.com/)"
 
 
 def na(v):
@@ -45,6 +45,9 @@ def num(v):
 
 
 def pct(a, b):
+    """Comparable growth only when the prior value is positive.
+    Sign changes are classified separately instead of producing misleading huge percentages.
+    """
     a, b = num(a), num(b)
     if a is None or b is None or b <= 0:
         return None
@@ -229,10 +232,12 @@ def growth_class(current, previous):
     c, p = num(current), num(previous)
     if c is None or p is None:
         return "NA"
-    if p <= 0 < c:
+    if p < 0 and c >= 0:
         return "赤字→黒字転換"
-    if c < 0 <= p:
+    if p >= 0 and c < 0:
         return "黒字→赤字転落"
+    if p < 0 and c < 0:
+        return "赤字継続"
     if abs(p) < 1e-9:
         return "分母極小・NA"
     return "通常成長率"
@@ -292,12 +297,54 @@ def _statement_value(df, names, col):
     return None
 
 
+def _latest_quarterly(df):
+    if df is None or df.empty:
+        return None
+    cols = list(df.columns)
+    return cols[0] if cols else None
+
+
+def _sum_last_four_quarters(df, names):
+    if df is None or df.empty:
+        return None, None
+    cols = list(df.columns)[:4]
+    vals = []
+    for col in cols:
+        v = _statement_value(df, names, col)
+        if v is None:
+            return None, None
+        vals.append(v)
+    return sum(vals), cols[-1]
+
+
+def _period_label(col):
+    if hasattr(col, "date"):
+        return str(col.date())
+    return str(col)
+
+
+def _fmt_money(v, currency):
+    if v is None:
+        return "NA"
+    x = abs(v)
+    sign = "-" if v < 0 else ""
+    if currency == "USD":
+        if x >= 1e12: return f"{sign}${x/1e12:.2f}T"
+        if x >= 1e9: return f"{sign}${x/1e9:.2f}B"
+        if x >= 1e6: return f"{sign}${x/1e6:.2f}M"
+        return f"{sign}${x:,.0f}"
+    if x >= 1e12: return f"{sign}¥{x/1e12:.2f}T"
+    if x >= 1e8: return f"{sign}¥{x/1e8:.2f}億"
+    if x >= 1e6: return f"{sign}¥{x/1e6:.2f}百万"
+    return f"{sign}¥{x:,.0f}"
+
+
 def financial_snapshot(company: Company):
-    """
-    Financial layer:
-    - Uses one explicit annual fiscal period for revenue/operating income/net income/EPS.
-    - Price is current/latest market price, but every ratio is labeled by its earnings/book/revenue basis.
-    - Missing values remain None.
+    """Financial layer with explicit TTM / latest-quarter balance-sheet bases.
+
+    Valuation fields exposed as PER/PSR/EV-EBITDA are TTM-based.
+    PBR/BPS/cash/debt are based on the latest available quarterly balance sheet.
+    Latest annual figures remain available separately for historical context.
     """
     symbol = yahoo_ticker(company.ticker, company.market)
     try:
@@ -306,44 +353,57 @@ def financial_snapshot(company: Company):
         hist = tk.history(period="5d", auto_adjust=False)
         price = float(hist["Close"].dropna().iloc[-1]) if not hist.empty else None
 
+        q_income = getattr(tk, "quarterly_income_stmt", pd.DataFrame())
+        q_balance = getattr(tk, "quarterly_balance_sheet", pd.DataFrame())
+        q_cash = getattr(tk, "quarterly_cashflow", pd.DataFrame())
         income = tk.income_stmt
         balance = tk.balance_sheet
         cash = tk.cashflow
 
+        if q_income is None or q_income.empty:
+            q_income = income
+        if q_balance is None or q_balance.empty:
+            q_balance = balance
+        if q_cash is None or q_cash.empty:
+            q_cash = cash
         if income is None or income.empty:
-            return {"取得元": "Yahoo Finance/yfinance", "整合性チェック": "DATA_UNAVAILABLE"}
+            return {"財務取得状態": "DATA_UNAVAILABLE", "取得元": "Yahoo Finance/yfinance", "整合性チェック": "DATA_UNAVAILABLE"}
 
-        cols = list(income.columns)
-        latest = cols[0] if cols else None
-        previous = cols[1] if len(cols) > 1 else None
+        annual_cols = list(income.columns)
+        latest_annual = annual_cols[0] if annual_cols else None
+        previous_annual = annual_cols[1] if len(annual_cols) > 1 else None
 
-        revenue = _statement_value(income, ["Total Revenue", "Operating Revenue"], latest)
-        revenue_prev = _statement_value(income, ["Total Revenue", "Operating Revenue"], previous)
+        # Latest annual context.
+        annual_revenue = _statement_value(income, ["Total Revenue", "Operating Revenue"], latest_annual)
+        annual_revenue_prev = _statement_value(income, ["Total Revenue", "Operating Revenue"], previous_annual)
+        annual_op = _statement_value(income, ["Operating Income", "Operating Income Loss"], latest_annual)
+        annual_op_prev = _statement_value(income, ["Operating Income", "Operating Income Loss"], previous_annual)
+        annual_net = _statement_value(income, ["Net Income", "Net Income Common Stockholders"], latest_annual)
+        annual_net_prev = _statement_value(income, ["Net Income", "Net Income Common Stockholders"], previous_annual)
+        annual_eps = _statement_value(income, ["Diluted EPS", "Basic EPS"], latest_annual)
+        annual_eps_prev = _statement_value(income, ["Diluted EPS", "Basic EPS"], previous_annual)
 
-        op_profit = _statement_value(income, ["Operating Income", "Operating Income Loss"], latest)
-        op_profit_prev = _statement_value(income, ["Operating Income", "Operating Income Loss"], previous)
+        # TTM = latest four reported quarters, not latest annual fiscal year.
+        revenue, ttm_end = _sum_last_four_quarters(q_income, ["Total Revenue", "Operating Revenue"])
+        op_profit, _ = _sum_last_four_quarters(q_income, ["Operating Income", "Operating Income Loss"])
+        net_income, _ = _sum_last_four_quarters(q_income, ["Net Income", "Net Income Common Stockholders"])
+        eps, _ = _sum_last_four_quarters(q_income, ["Diluted EPS", "Basic EPS"])
+        ebitda, _ = _sum_last_four_quarters(q_income, ["EBITDA", "Normalized EBITDA"])
 
-        net_income = _statement_value(income, ["Net Income", "Net Income Common Stockholders"], latest)
-        net_income_prev = _statement_value(income, ["Net Income", "Net Income Common Stockholders"], previous)
-
-        eps = _statement_value(income, ["Diluted EPS", "Basic EPS"], latest)
         if eps is None and net_income is not None:
-            shares = _statement_value(income, ["Diluted Average Shares", "Basic Average Shares"], latest)
+            shares = _statement_value(q_income, ["Diluted Average Shares", "Basic Average Shares"], list(q_income.columns)[0]) if not q_income.empty else None
             eps = safe_ratio(net_income, shares)
 
-        # Latest balance-sheet book value and cash/debt.
-        equity = _statement_value(balance, ["Stockholders Equity", "Common Stock Equity"], latest)
-        assets = _statement_value(balance, ["Total Assets"], latest)
-        cash_eq = _statement_value(balance, ["Cash Cash Equivalents And Short Term Investments", "Cash And Cash Equivalents"], latest)
-        debt = _statement_value(balance, ["Total Debt"], latest)
-        shares_out = _statement_value(balance, ["Ordinary Shares Number", "Share Issued"], latest)
-
-        # Cash flow.
-        cfo = _statement_value(cash, ["Operating Cash Flow", "Total Cash From Operating Activities"], latest)
-        capex = _statement_value(cash, ["Capital Expenditure", "Capital Expenditure Reported"], latest)
-        fcf = None
-        if cfo is not None and capex is not None:
-            fcf = cfo + capex if capex < 0 else cfo - capex
+        # Latest available balance sheet (prefer quarterly / MRQ).
+        bs_cols = list(q_balance.columns) if q_balance is not None and not q_balance.empty else list(balance.columns)
+        latest_bs = bs_cols[0] if bs_cols else None
+        previous_bs = bs_cols[1] if len(bs_cols) > 1 else None
+        equity = _statement_value(q_balance, ["Stockholders Equity", "Common Stock Equity", "Total Equity Gross Minority Interest"], latest_bs)
+        equity_prev = _statement_value(q_balance, ["Stockholders Equity", "Common Stock Equity", "Total Equity Gross Minority Interest"], previous_bs)
+        cash_eq = _statement_value(q_balance, ["Cash Cash Equivalents And Short Term Investments", "Cash And Cash Equivalents", "Cash Financial"], latest_bs)
+        debt = _statement_value(q_balance, ["Total Debt", "Long Term Debt And Capital Lease Obligation", "Current Debt And Capital Lease Obligation"], latest_bs)
+        shares_out = _statement_value(q_balance, ["Ordinary Shares Number", "Share Issued", "Common Stock Shares Outstanding"], latest_bs)
+        assets = _statement_value(q_balance, ["Total Assets"], latest_bs)
 
         market_cap = None
         try:
@@ -354,43 +414,36 @@ def financial_snapshot(company: Company):
             market_cap = price * shares_out
 
         bps = safe_ratio(equity, shares_out)
-        per = safe_ratio(price, eps)
-        psr = safe_ratio(market_cap, revenue)
+        per_ttm = safe_ratio(price, eps)
+        psr_ttm = safe_ratio(market_cap, revenue)
         pbr = safe_ratio(price, bps)
 
-        ebitda = _statement_value(income, ["EBITDA", "Normalized EBITDA"], latest)
         if ebitda is None and op_profit is not None:
-            da = _statement_value(cash, ["Depreciation And Amortization", "Depreciation"], latest)
+            da, _ = _sum_last_four_quarters(q_cash, ["Depreciation And Amortization", "Depreciation"])
             if da is not None:
                 ebitda = op_profit + abs(da)
+        ev = market_cap + (debt or 0) - (cash_eq or 0) if market_cap is not None else None
+        ev_ebitda_ttm = safe_ratio(ev, ebitda)
 
-        ev = None
-        if market_cap is not None:
-            ev = market_cap + (debt or 0) - (cash_eq or 0)
-        ev_ebitda = safe_ratio(ev, ebitda)
+        # TTM cash flow from latest four quarters.
+        cfo, cfo_end = _sum_last_four_quarters(q_cash, ["Operating Cash Flow", "Total Cash From Operating Activities"])
+        capex, _ = _sum_last_four_quarters(q_cash, ["Capital Expenditure", "Capital Expenditure Reported"])
+        fcf = None
+        if cfo is not None and capex is not None:
+            fcf = cfo + capex if capex < 0 else cfo - capex
 
-        # ROE = net income / average equity where possible.
-        equity_prev = _statement_value(balance, ["Stockholders Equity", "Common Stock Equity"], previous)
-        avg_equity = None
-        if equity is not None and equity_prev is not None:
-            avg_equity = (equity + equity_prev) / 2
-        roe = safe_ratio(net_income, avg_equity or equity)
+        # TTM ROE using average MRQ/previous-quarter equity where possible.
+        avg_equity = (equity + equity_prev) / 2 if equity is not None and equity_prev is not None else equity
+        roe = safe_ratio(net_income, avg_equity)
 
-        # ROIC = NOPAT / invested capital.
-        pretax = _statement_value(income, ["Pretax Income"], latest)
-        tax = _statement_value(income, ["Tax Provision", "Tax Provision Benefit"], latest)
-        tax_rate = None
-        if pretax is not None and pretax > 0 and tax is not None:
-            tax_rate = max(0.0, min(0.35, tax / pretax))
-        if tax_rate is None:
-            tax_rate = 0.25
+        pretax, _ = _sum_last_four_quarters(q_income, ["Pretax Income"])
+        tax, _ = _sum_last_four_quarters(q_income, ["Tax Provision", "Tax Provision Benefit"])
+        tax_rate = tax / pretax if pretax and pretax > 0 and tax is not None else 0.25
+        tax_rate = max(0.0, min(0.35, tax_rate))
         nopat = op_profit * (1 - tax_rate) if op_profit is not None else None
-        invested_capital = None
-        if equity is not None:
-            invested_capital = equity + (debt or 0) - (cash_eq or 0)
-        roic = safe_ratio(nopat, invested_capital)
+        invested_capital = equity + (debt or 0) - (cash_eq or 0) if equity is not None else None
+        roic = safe_ratio(nopat, invested_capital) if invested_capital and invested_capital > 0 else None
 
-        # Dividend: use trailing cash dividends from Yahoo history.
         dividend_yield = None
         payout = None
         try:
@@ -402,21 +455,19 @@ def financial_snapshot(company: Company):
                     idx = idx.tz_localize("UTC")
                 annual_div = float(divs.loc[idx >= one_year_ago].sum())
                 dividend_yield = annual_div / price * 100
-                payout = safe_ratio(annual_div, eps) * 100 if eps and eps > 0 else None
+                payout = safe_ratio(annual_div, eps) * 100 if eps is not None and eps > 0 else None
         except Exception:
             pass
 
-        # Profit-quality flags: detect explicit one-off / non-operating items.
         oneoff_terms = [
-            "Gain On Sale Of Security", "Gain On Sale Of Assets",
-            "Gain On Sale Of Business", "Other Non Operating Income Expenses",
-            "Special Income Charges", "Restructuring And Mergern Acquisition",
+            "Gain On Sale Of Security", "Gain On Sale Of Assets", "Gain On Sale Of Business",
+            "Other Non Operating Income Expenses", "Special Income Charges", "Restructuring And Mergern Acquisition",
             "Impairment", "Write Off", "Extraordinary Items"
         ]
         oneoff = []
         for term in oneoff_terms:
-            v = _statement_value(income, [term], latest)
-            if v is not None and abs(v) > max(abs(net_income or 0) * 0.05, 1):
+            v = _statement_value(income, [term], latest_annual)
+            if v is not None and abs(v) > max(abs(annual_net or 0) * 0.05, 1):
                 oneoff.append(term)
 
         if net_income is None:
@@ -432,20 +483,15 @@ def financial_snapshot(company: Company):
         else:
             quality = "暫定良好"
 
-        # Growth: never turn sign changes / tiny bases into giant percentages.
-        eps_prev = _statement_value(income, ["Diluted EPS", "Basic EPS"], previous)
-        if eps_prev is None and net_income_prev is not None:
-            shares_prev = _statement_value(income, ["Diluted Average Shares", "Basic Average Shares"], previous)
-            eps_prev = safe_ratio(net_income_prev, shares_prev)
-        eps_growth = pct(eps, eps_prev)
-        rev_growth = pct(revenue, revenue_prev)
-        op_growth = pct(op_profit, op_profit_prev)
+        eps_growth = pct(annual_eps, annual_eps_prev)
+        rev_growth = pct(annual_revenue, annual_revenue_prev)
+        op_growth = pct(annual_op, annual_op_prev)
 
         checks = []
-        if per is not None and eps is not None and price is not None:
-            checks.append(abs(per - price / eps) / max(abs(per), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
-        if psr is not None and market_cap is not None and revenue:
-            checks.append(abs(psr - market_cap / revenue) / max(abs(psr), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
+        if per_ttm is not None and eps is not None and price is not None:
+            checks.append(abs(per_ttm - price / eps) / max(abs(per_ttm), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
+        if psr_ttm is not None and market_cap is not None and revenue:
+            checks.append(abs(psr_ttm - market_cap / revenue) / max(abs(psr_ttm), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
         if pbr is not None and price is not None and bps:
             checks.append(abs(pbr - price / bps) / max(abs(pbr), 1e-9) <= CONFIG["valuation_consistency_tolerance"])
         integrity = "OK" if checks and all(checks) else ("⚠要確認" if checks else "DATA_UNAVAILABLE")
@@ -453,30 +499,43 @@ def financial_snapshot(company: Company):
         op_margin = safe_ratio(op_profit, revenue) * 100 if revenue else None
         net_margin = safe_ratio(net_income, revenue) * 100 if revenue else None
         debt_to_equity = safe_ratio(debt, equity) * 100 if equity else None
-        net_cash = (cash_eq - debt) if cash_eq is not None and debt is not None else None
+        net_cash = cash_eq - debt if cash_eq is not None and debt is not None else None
+
+        # Detect mathematically valid but analytically misleading values.
+        warnings = []
+        if eps is not None and eps < 0: warnings.append("TTM EPS赤字")
+        if eps is not None and eps > 0 and eps_growth is None and annual_eps_prev is not None: warnings.append("EPS成長率比較不能")
+        if roe is not None and abs(roe) > 1: warnings.append("ROE絶対値100%超・要因確認")
+        if roic is not None and abs(roic) > 1: warnings.append("ROIC絶対値100%超・要因確認")
+        if per_ttm is not None and per_ttm < 0: warnings.append("PERは赤字のため参考外")
+        if ev_ebitda_ttm is not None and ev_ebitda_ttm < 0: warnings.append("EV/EBITDAは赤字のため参考外")
+        if payout is not None and payout > 100: warnings.append("配当性向100%超")
+        if dividend_yield is not None and dividend_yield > 20: warnings.append("配当利回り20%超・要確認")
 
         return {
-            "財務取得状態": "OK",
-            "株価": price, "時価総額": market_cap, "PER": per, "PBR": pbr, "PSR": psr, "EV/EBITDA": ev_ebitda,
-            "EPS": eps, "EPS前期": eps_prev, "EPS成長率": eps_growth, "EPS成長判定": growth_class(eps, eps_prev),
-            "売上": revenue, "売上前期": revenue_prev, "売上成長率": rev_growth,
-            "営業利益": op_profit, "営業利益前期": op_profit_prev, "営業利益成長率": op_growth, "営業利益率": op_margin,
-            "純利益": net_income, "純利益前期": net_income_prev, "純利益率": net_margin, "BPS": bps,
+            "財務取得状態": "OK", "通貨": company.currency, "株価": price, "時価総額": market_cap,
+            "PER": per_ttm, "PBR": pbr, "PSR": psr_ttm, "EV/EBITDA": ev_ebitda_ttm,
+            "PER_TTM": per_ttm, "PSR_TTM": psr_ttm, "EV/EBITDA_TTM": ev_ebitda_ttm,
+            "PER_直近年度": safe_ratio(price, annual_eps), "EPS_直近年度": annual_eps, "EPS_直近年度前期": annual_eps_prev,
+            "EPS": eps, "EPS前期": annual_eps_prev, "EPS成長率": eps_growth, "EPS成長判定": growth_class(annual_eps, annual_eps_prev),
+            "売上": revenue, "売上前期": annual_revenue_prev, "売上成長率": rev_growth,
+            "営業利益": op_profit, "営業利益前期": annual_op_prev, "営業利益成長率": op_growth, "営業利益率": op_margin,
+            "純利益": net_income, "純利益前期": annual_net_prev, "純利益率": net_margin, "BPS": bps,
             "株主資本": equity, "総資産": assets, "現金等": cash_eq, "有利子負債": debt,
             "ネットキャッシュ": net_cash, "負債/株主資本": debt_to_equity,
-            "ROE": (roe * 100 if roe is not None else None), "ROIC": (roic * 100 if roic is not None else None),
+            "ROE": roe * 100 if roe is not None else None, "ROIC": roic * 100 if roic is not None else None,
             "営業CF": cfo, "FCF": fcf, "配当利回り": dividend_yield, "配当性向": payout,
             "一時要因": " / ".join(oneoff) if oneoff else "検出なし", "利益品質": quality,
             "バリュエーション整合性": integrity, "データ基準日": datetime.now(JST).date().isoformat(),
-            "決算期": str(latest.date()) if hasattr(latest, "date") else str(latest),
-            "指標基準": "直近年次決算ベース（株価のみ最新）", "取得元": "Yahoo Finance/yfinance", "整合性チェック": integrity,
+            "決算期": _period_label(latest_bs), "TTM基準日": _period_label(ttm_end) if ttm_end else "",
+            "指標基準": "PER/PSR/EV/EBITDA=TTM、PBR/BPS/現金/負債=最新四半期、成長率=直近年度比較",
+            "取得元": "Yahoo Finance/yfinance", "整合性チェック": integrity,
+            "数値警告": " / ".join(warnings) if warnings else "なし",
         }
+
     except Exception as e:
-        return {
-            "財務取得状態": "DATA_UNAVAILABLE",
-            "取得元": "Yahoo Finance/yfinance",
-            "整合性チェック": f"DATA_UNAVAILABLE:{type(e).__name__}"
-        }
+        return {"財務取得状態": "DATA_UNAVAILABLE", "取得元": "Yahoo Finance/yfinance", "整合性チェック": f"DATA_UNAVAILABLE:{type(e).__name__}", "数値警告": str(e)}
+
 
 _FIN_CACHE = {}
 _CHART_CACHE = {}
@@ -562,12 +621,20 @@ def main():
             "株価反応5日": price_5d,
             "株価反応20日": price_20d,
             "未織り込みギャップ": gap,
+            "通貨": fin.get("通貨", company.currency if company else ""),
             "株価": fin.get("株価"),
+            "株価表示": f"{fin.get("通貨", company.currency if company else "")} {fin.get("株価"):.2f}" if fin.get("株価") is not None else "NA",
             "時価総額": fin.get("時価総額"),
+            "時価総額表示": _fmt_money(fin.get("時価総額"), fin.get("通貨", company.currency if company else "")),
             "PER": fin.get("PER"),
             "PBR": fin.get("PBR"),
             "PSR": fin.get("PSR"),
             "EV/EBITDA": fin.get("EV/EBITDA"),
+            "PER_TTM": fin.get("PER_TTM"),
+            "PSR_TTM": fin.get("PSR_TTM"),
+            "EV/EBITDA_TTM": fin.get("EV/EBITDA_TTM"),
+            "PER_直近年度": fin.get("PER_直近年度"),
+            "TTM基準日": fin.get("TTM基準日", ""),
             "EPS": fin.get("EPS"),
             "EPS前期": fin.get("EPS前期"),
             "EPS成長率": fin.get("EPS成長率"),
@@ -603,6 +670,7 @@ def main():
             "指標基準": fin.get("指標基準", ""),
             "取得元": "; ".join(x for x in ["Google News RSS", fin.get("取得元", "Yahoo chart")] if x),
             "整合性チェック": fin.get("整合性チェック", "財務データ未取得"),
+            "数値警告": fin.get("数値警告", ""),
             "リスク": ("利益品質:" + str(fin.get("利益品質")) if fin.get("利益品質") not in (None, "暫定良好", "未判定") else ("財務データ未取得" if ticker else "企業未特定")),
             "タイトル": item["title"],
             "公開日時": item["published"],
@@ -617,6 +685,33 @@ def main():
     sort_cols = [c for c in ["未織り込みギャップ", "事業進展スコア", "企業関与信頼度"] if c in df]
     if sort_cols:
         df = df.sort_values(sort_cols, ascending=False)
+
+    # Pre-delivery diagnostics: detect structural, numerical, and classification anomalies.
+    diagnostics = []
+    for _, rr in df.iterrows():
+        if rr.get("企業") == "未特定":
+            continue
+        checks = []
+        if rr.get("PER") is not None and rr.get("EPS") not in (None, 0) and rr.get("株価") is not None:
+            expected = rr["株価"] / rr["EPS"]
+            if abs(expected - rr["PER"]) / max(abs(rr["PER"]), 1e-9) > CONFIG["valuation_consistency_tolerance"]:
+                checks.append("PER再計算不一致")
+        if rr.get("PSR") is not None and rr.get("時価総額") is not None and rr.get("売上") not in (None, 0):
+            expected = rr["時価総額"] / rr["売上"]
+            if abs(expected - rr["PSR"]) / max(abs(rr["PSR"]), 1e-9) > CONFIG["valuation_consistency_tolerance"]:
+                checks.append("PSR再計算不一致")
+        if rr.get("PBR") is not None and rr.get("BPS") not in (None, 0) and rr.get("株価") is not None:
+            expected = rr["株価"] / rr["BPS"]
+            if abs(expected - rr["PBR"]) / max(abs(rr["PBR"]), 1e-9) > CONFIG["valuation_consistency_tolerance"]:
+                checks.append("PBR再計算不一致")
+        if rr.get("EPS成長判定") in ("赤字→黒字転換", "黒字→赤字転落", "赤字継続") and rr.get("EPS成長率") is not None:
+            checks.append("成長率分類と数値の不整合")
+        if rr.get("数値警告") not in (None, "", "なし"):
+            checks.append(str(rr.get("数値警告")))
+        if checks:
+            diagnostics.append({"企業": rr.get("企業"), "ticker": rr.get("証券コード・ティッカー"), "問題": " / ".join(dict.fromkeys(checks))})
+    diag_path = DATA / f"data_quality_{TODAY}.json"
+    diag_path.write_text(json.dumps({"version":"4.2","date":TODAY,"status":"PASS_WITH_WARNINGS" if diagnostics else "PASS","issues":diagnostics}, ensure_ascii=False, indent=2), encoding="utf-8")
 
     out = DATA / f"radar_{TODAY}.csv"
     df.to_csv(out, index=False, encoding="utf-8-sig")
@@ -644,17 +739,19 @@ def main():
         rep = candidates
 
     md = [
-        f"# Future Stock Radar v4.1 — {TODAY}",
+        f"# Future Stock Radar v4.2 — {TODAY}",
         "",
         "> 調査優先度を示す研究用レーダーです。売買推奨・将来リターン保証ではありません。",
         "",
-        "## v4.1 ブラッシュアップ内容",
-        "- v4の既存項目を削らず、候補レポート側にも詳細財務を展開。",
+        "## v4.2 ブラッシュアップ内容",
+        "- v4.1の項目を維持し、TTM/最新四半期/年度比較の基準を分離。",
         "- 株価履歴の取得期間を明示し、1D/5D/20D反応を実測。",
         "- 配当履歴をSeriesとして正しく集計し、配当利回り・配当性向を復元。",
         "- 同一企業の財務データをニュースごとに再取得せずキャッシュ。",
         "- 財務データ未取得の候補は未織り込みギャップを上限値で抑制。",
-        "- 一時要因、営業利益率、純利益、BPS、現金、有利子負債、ネットキャッシュ等を追加。",
+        "- 一時要因、営業利益率、純利益、BPS、現金、有利子負債、ネットキャッシュ等を維持。",
+        "- 赤字転換等では意味のない巨大な成長率をNAにし、分類で表示。",
+        "- 数値警告と出荷前データ品質診断を自動生成。",
         "",
         "## 読み方",
         "- 未織り込みギャップは、事業進展と直近株価反応の差をみる内部研究指標であり、将来リターン予測ではありません。",
@@ -680,13 +777,14 @@ def main():
             f"- テーマ：{r['テーマ']} / 企業関与信頼度：{fmt(r['企業関与信頼度'])}",
             "",
             "**株価・バリュエーション**",
-            f"- 株価：{fmt(r['株価'])} / 時価総額：{fmt(r['時価総額'])} / 規模区分：{r['企業規模区分']}",
-            f"- PER：{fmt(r['PER'])} / PBR：{fmt(r['PBR'])} / PSR：{fmt(r['PSR'])} / EV/EBITDA：{fmt(r['EV/EBITDA'])}",
+            f"- 通貨：{r['通貨']} / 株価：{fmt(r['株価'])} / 時価総額：{r['時価総額表示']} / 規模区分：{r['企業規模区分']}",
+            f"- PER（TTM）：{fmt(r['PER'])} / PER（直近年度）：{fmt(r['PER_直近年度'])} / PBR（最新四半期）：{fmt(r['PBR'])}",
+            f"- PSR（TTM）：{fmt(r['PSR'])} / EV/EBITDA（TTM）：{fmt(r['EV/EBITDA'])}",
             f"- 株価反応：1D {pctfmt(r['株価反応1日'])} / 5D {pctfmt(r['株価反応5日'])} / 20D {pctfmt(r['株価反応20日'])}",
             f"- バリュエーション整合性：{r['バリュエーション整合性']}",
             "",
             "**成長・収益性・キャッシュフロー**",
-            f"- EPS：{fmt(r['EPS'])} / 前期：{fmt(r['EPS前期'])} / 成長率：{pctfmt(r['EPS成長率'])} / 判定：{r['EPS成長判定']}",
+            f"- EPS（TTM）：{fmt(r['EPS'])} / EPS（直近年度）：{fmt(r['EPS_直近年度'])} / 前年度：{fmt(r['EPS_直近年度前期'])} / 成長率：{pctfmt(r['EPS成長率'])} / 判定：{r['EPS成長判定']}",
             f"- 売上：{fmt(r['売上'])} / 前期：{fmt(r['売上前期'])} / 成長率：{pctfmt(r['売上成長率'])}",
             f"- 営業利益：{fmt(r['営業利益'])} / 成長率：{pctfmt(r['営業利益成長率'])} / 営業利益率：{pctfmt(r['営業利益率'])}",
             f"- 純利益：{fmt(r['純利益'])} / 純利益率：{pctfmt(r['純利益率'])}",
@@ -702,9 +800,9 @@ def main():
             "",
             "**データ基準**",
             f"- 財務取得状態：{r['財務取得状態']}",
-            f"- データ基準日：{r['データ基準日']} / 決算期：{r['決算期']}",
+            f"- データ基準日：{r['データ基準日']} / TTM基準：{r['TTM基準日']} / 最新BS：{r['決算期']}",
             f"- 指標基準：{r['指標基準']}",
-            f"- 取得元：{r['取得元']} / 整合性：{r['整合性チェック']}",
+            f"- 取得元：{r['取得元']} / 整合性：{r['整合性チェック']} / 数値警告：{r['数値警告']}",
             f"- リスク表示：{r['リスク']}",
             f"- 代表材料：{r['タイトル']}",
             f"- 公開日時：{r['公開日時']}",
