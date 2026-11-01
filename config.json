@@ -1,48 +1,36 @@
 {
-  "timezone": "Asia/Tokyo",
-  "max_news_items": 500,
-  "min_entity_confidence": 0.72,
-  "valuation_consistency_tolerance": 0.08,
-  "candidate_score_cap_without_financials": 45,
-  "small_cap_jpy": 300000000000,
-  "small_cap_usd": 30000000000,
-  "sources": {
-    "google_news_rss": true,
-    "yahoo_finance": true
+  "universe": {
+    "markets": ["US", "JP"],
+    "us_symbols": ["AAPL", "MSFT", "NVDA", "AMD", "AVGO", "GOOGL", "AMZN", "META", "PLTR", "IONQ", "RKLB", "SOUN", "JOBY", "ACHR", "WULF", "HUT", "WKSP"],
+    "jp_symbols": ["6701.T", "285A.T", "6526.T", "5803.T", "5801.T", "5802.T", "6525.T", "6857.T", "6920.T", "5595.T", "3778.T", "3350.T", "3133.T", "4593.T", "9348.T"],
+    "max_symbols_per_run": 250
   },
-  "watchlists": {
-    "US": [
-      "NVDA",
-      "AMD",
-      "AVGO",
-      "MRVL",
-      "COHR",
-      "LITE",
-      "AMAT",
-      "AMKR",
-      "CSCO",
-      "INTC",
-      "EQIX",
-      "AEHR",
-      "GLW"
-    ],
-    "JP": [
-      "285A",
-      "6857",
-      "6971",
-      "9432",
-      "6723",
-      "6501",
-      "6503",
-      "7011",
-      "3133",
-      "3444",
-      "4392",
-      "6888"
-    ]
+  "screening": {
+    "history_days": 400,
+    "min_history_rows": 80,
+    "min_average_volume_20d": 100000,
+    "watchlist_size": 30,
+    "top_candidates": 10,
+    "momentum_period_days": 63,
+    "max_abs_daily_return": 0.35
   },
-  "version": "4.3",
-  "chart_period": "6mo",
-  "max_candidates": 30,
-  "diagnostics": true
+  "scoring_weights": {
+    "momentum_3m": 20,
+    "momentum_1m": 10,
+    "trend": 15,
+    "volume_confirmation": 10,
+    "volatility_quality": 10,
+    "drawdown_quality": 10,
+    "liquidity": 10,
+    "data_quality": 15
+  },
+  "evaluation": {
+    "forward_days": [1, 5, 20],
+    "minimum_predictions_for_review": 30
+  },
+  "safety": {
+    "paper_only": true,
+    "no_broker_orders": true,
+    "no_auto_position_sizing": true
+  }
 }
