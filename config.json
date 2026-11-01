@@ -1,8 +1,45 @@
 {
   "universe": {
-    "markets": ["US", "JP"],
-    "us_symbols": ["AAPL", "MSFT", "NVDA", "AMD", "AVGO", "GOOGL", "AMZN", "META", "PLTR", "IONQ", "RKLB", "SOUN", "JOBY", "ACHR", "WULF", "HUT", "WKSP"],
-    "jp_symbols": ["6701.T", "285A.T", "6526.T", "5803.T", "5801.T", "5802.T", "6525.T", "6857.T", "6920.T", "5595.T", "3778.T", "3350.T", "3133.T", "4593.T", "9348.T"],
+    "markets": [
+      "US",
+      "JP"
+    ],
+    "us_symbols": [
+      "AAPL",
+      "MSFT",
+      "NVDA",
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "AMZN",
+      "META",
+      "PLTR",
+      "IONQ",
+      "RKLB",
+      "SOUN",
+      "JOBY",
+      "ACHR",
+      "WULF",
+      "HUT",
+      "WKSP"
+    ],
+    "jp_symbols": [
+      "6701.T",
+      "285A.T",
+      "6526.T",
+      "5803.T",
+      "5801.T",
+      "5802.T",
+      "6525.T",
+      "6857.T",
+      "6920.T",
+      "5595.T",
+      "3778.T",
+      "3350.T",
+      "3133.T",
+      "4593.T",
+      "9348.T"
+    ],
     "max_symbols_per_run": 250
   },
   "screening": {
@@ -24,13 +61,37 @@
     "liquidity": 10,
     "data_quality": 15
   },
+  "fundamentals": {
+    "enabled": true,
+    "max_symbols_per_run": 40,
+    "request_pause_seconds": 0.15
+  },
+  "news": {
+    "enabled": true,
+    "max_headlines_per_symbol": 5
+  },
   "evaluation": {
-    "forward_days": [1, 5, 20],
-    "minimum_predictions_for_review": 30
+    "forward_days": [
+      1,
+      5,
+      20,
+      60
+    ],
+    "minimum_predictions_for_review": 30,
+    "benchmark_us": "SPY",
+    "benchmark_jp": "1306.T"
+  },
+  "agents": {
+    "enabled": true,
+    "local_ollama_enabled": false,
+    "ollama_url": "http://127.0.0.1:11434/api/generate",
+    "ollama_model": "llama3.2",
+    "max_llm_symbols": 5
   },
   "safety": {
     "paper_only": true,
     "no_broker_orders": true,
-    "no_auto_position_sizing": true
+    "no_auto_position_sizing": true,
+    "auto_change_scoring_weights": false
   }
 }

@@ -1,10 +1,14 @@
 from __future__ import annotations
-import json, os, math
+import json, os, math, time
 from datetime import datetime, timezone
 from pathlib import Path
+from agents.research import enrich_universe, write_agent_reviews
 import numpy as np
 import pandas as pd
-import yfinance as yf
+try:
+    import yfinance as yf
+except ImportError:  # allows offline unit tests; runtime data downloads still require yfinance
+    yf = None
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
@@ -25,6 +29,9 @@ def symbols_from_config(cfg):
     return syms[:limit]
 
 def download_history(symbol, period="2y"):
+    if yf is None:
+        print("[WARN] yfinance is not installed; cannot download market data")
+        return None
     try:
         df = yf.download(symbol, period=period, auto_adjust=True, progress=False, threads=False)
         if df is None or df.empty:
@@ -150,6 +157,18 @@ def main():
     ranked.head(int(cfg["screening"]["watchlist_size"])).to_csv(DATA / "latest_watchlist.csv", index=False)
     ranked.head(int(cfg["screening"]["top_candidates"])).to_csv(REPORTS / "latest_top_candidates.csv", index=False)
     append_prediction_history(ranked, run_date)
+    # Optional enrichment is deliberately fault-tolerant: the technical radar remains available
+    # if a provider has missing fields, rate limits, or temporary outages.
+    try:
+        enriched = enrich_universe(ranked, cfg)
+        if not enriched.empty:
+            enriched.to_csv(REPORTS / "research_enrichment.csv", index=False)
+            write_agent_reviews(enriched, REPORTS / "agent_review.md", cfg)
+            enriched.sort_values(["research_score", "score"], ascending=False).head(
+                int(cfg["screening"]["top_candidates"])
+            ).to_csv(REPORTS / "latest_research_candidates.csv", index=False)
+    except Exception as exc:
+        print(f"[WARN] enrichment failed; technical radar still saved: {exc}")
     print(f"Wrote {out}; valid symbols={len(ranked)}")
     print(ranked.head(10)[["rank", "symbol", "close", "score", "quality_flag"]].to_string(index=False))
 
