@@ -1,69 +1,63 @@
-name: Daily Future Stock Radar v4.3
+name: Daily Stock Radar
 
 on:
-  schedule:
-    # 07:17 JST = 22:17 UTC (previous day)
-    - cron: "17 22 * * *"
   workflow_dispatch:
+  schedule:
+    # 06:30 UTC = 15:30 JST. This is after Japan's normal cash session and before the US session.
+    - cron: "30 6 * * 1-5"
 
 permissions:
   contents: write
 
 concurrency:
-  group: future-stock-radar
+  group: daily-stock-radar
   cancel-in-progress: false
 
 jobs:
   radar:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.11"
+          cache: pip
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Validate radar files
+      - name: Validate required files
         run: |
-          python - <<'PY'
-          from pathlib import Path
-          required = [Path("radar.py"), Path("config.json"), Path("requirements.txt")]
-          missing = [str(p) for p in required if not p.exists()]
-          if missing:
-              raise SystemExit("Missing required files: " + ", ".join(missing))
-          print("Required files OK")
-          PY
+          test -f config.json
+          python -m json.tool config.json > /dev/null
 
-      - name: Run preflight tests
-        run: python -m unittest discover -s tests -v
+      - name: Run tests
+        run: pytest -q
 
-      - name: Run radar
+      - name: Build daily radar
         run: python radar.py
 
-      - name: Upload diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: future-stock-radar-diagnostics-v4.3
-          path: data/
-          if-no-files-found: ignore
+      - name: Evaluate matured predictions
+        run: python evaluate.py
 
-      - name: Save results
-        if: success()
+      - name: Create improvement review
+        run: python improve.py
+
+      - name: Commit generated reports
         run: |
-          git config user.name "future-stock-radar[bot]"
+          git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/
+          git add data reports
           if git diff --cached --quiet; then
-            echo "No changes to save."
-            exit 0
+            echo "No report changes to commit."
+          else
+            git commit -m "Daily radar update $(date -u +%F)"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
-          git commit -m "Update daily radar"
-          git fetch origin main
-          git rebase origin/main
-          git push origin HEAD:main
