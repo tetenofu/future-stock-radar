@@ -4,7 +4,22 @@
 
 ## Highest research scores
 
-### META — research score 74.46 / technical score 54.5
+### 285A.T — research score 73.92 / technical score 39.0
+
+- Company: KIOXIA HOLDINGS CORPORATION
+- Sector / industry: Technology / Semiconductors
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 63.333333333333336
+- Data status: ok
+- Risk notes: Technical trend score is weak; No headline data returned; this is not evidence that no catalyst exists
+- Headlines: No headlines returned
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
+
+### META — research score 73.83 / technical score 52.0
 
 - Company: Meta Platforms, Inc.
 - Sector / industry: Communication Services / Internet Content & Information
@@ -19,17 +34,6 @@
 
 skipped: max_llm_symbols limit
 
-### AAPL — research score 74.0 / technical score 86.0
-
-- Company: Apple Inc.
-- Sector / industry: Technology / Consumer Electronics
-- Growth score: 80.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
-- Headlines: No headlines returned
-
 ### MSFT — research score 73.06 / technical score 72.25
 
 - Company: Microsoft Corporation
@@ -40,21 +44,6 @@ skipped: max_llm_symbols limit
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
 - Headlines: No headlines returned
-
-### 285A.T — research score 72.67 / technical score 39.0
-
-- Company: KIOXIA HOLDINGS CORPORATION
-- Sector / industry: Technology / Semiconductors
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 58.333333333333336
-- Data status: ok
-- Risk notes: Technical trend score is weak; No headline data returned; this is not evidence that no catalyst exists
-- Headlines: No headlines returned
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
 
 ### 6857.T — research score 72.1 / technical score 66.75
 
@@ -67,6 +56,21 @@ skipped: max_llm_symbols limit
 - Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
 - Headlines: No headlines returned
 
+### 5802.T — research score 71.92 / technical score 41.0
+
+- Company: SUMITOMO ELECTRIC INDUSTRIES
+- Sector / industry: Consumer Cyclical / Auto Parts
+- Growth score: 90.0
+- Quality score: 73.33333333333333
+- Valuation heuristic: 83.33333333333333
+- Data status: ok
+- Risk notes: No headline data returned; this is not evidence that no catalyst exists
+- Headlines: No headlines returned
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
+
 ### 6701.T — research score 70.42 / technical score 60.0
 
 - Company: NEC CORP
@@ -76,6 +80,17 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 78.33333333333333
 - Data status: ok
 - Risk notes: No headline data returned; this is not evidence that no catalyst exists
+- Headlines: No headlines returned
+
+### AAPL — research score 69.94 / technical score 69.75
+
+- Company: Apple Inc.
+- Sector / industry: Technology / Consumer Electronics
+- Growth score: 80.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
 - Headlines: No headlines returned
 
 ### NVDA — research score 69.88 / technical score 49.5
@@ -93,32 +108,6 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### 5802.T — research score 69.83 / technical score 41.0
-
-- Company: SUMITOMO ELECTRIC INDUSTRIES
-- Sector / industry: Consumer Cyclical / Auto Parts
-- Growth score: 90.0
-- Quality score: 70.0
-- Valuation heuristic: 78.33333333333333
-- Data status: partial
-- Risk notes: No headline data returned; this is not evidence that no catalyst exists
-- Headlines: No headlines returned
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
-### PLTR — research score 69.54 / technical score 66.5
-
-- Company: Palantir Technologies Inc.
-- Sector / industry: Technology / Software - Infrastructure
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 18.333333333333332
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
-- Headlines: No headlines returned
-
 ### 5801.T — research score 67.29 / technical score 40.0
 
 - Company: FURUKAWA ELECTRIC CO
@@ -133,6 +122,17 @@ skipped: max_llm_symbols limit
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
+
+### PLTR — research score 67.29 / technical score 57.5
+
+- Company: Palantir Technologies Inc.
+- Sector / industry: Technology / Software - Infrastructure
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 18.333333333333332
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
+- Headlines: No headlines returned
 
 ## Method and limitations
 
