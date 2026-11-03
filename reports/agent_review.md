@@ -4,7 +4,7 @@
 
 ## Highest research scores
 
-### 285A.T — research score 73.92 / technical score 39.0
+### 285A.T — research score 74.54 / technical score 41.5
 
 - Company: KIOXIA HOLDINGS CORPORATION
 - Sector / industry: Technology / Semiconductors
@@ -12,14 +12,14 @@
 - Quality score: 93.33333333333333
 - Valuation heuristic: 63.333333333333336
 - Data status: ok
-- Risk notes: Technical trend score is weak; No headline data returned; this is not evidence that no catalyst exists
+- Risk notes: No headline data returned; this is not evidence that no catalyst exists
 - Headlines: No headlines returned
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
 
-### META — research score 73.83 / technical score 52.0
+### META — research score 73.21 / technical score 49.5
 
 - Company: Meta Platforms, Inc.
 - Sector / industry: Communication Services / Internet Content & Information
@@ -34,18 +34,7 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### MSFT — research score 73.06 / technical score 72.25
-
-- Company: Microsoft Corporation
-- Sector / industry: Technology / Software - Infrastructure
-- Growth score: 90.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
-- Headlines: No headlines returned
-
-### 6857.T — research score 72.1 / technical score 66.75
+### 6857.T — research score 71.35 / technical score 63.75
 
 - Company: ADVANTEST CORP
 - Sector / industry: Technology / Semiconductor Equipment & Materials
@@ -56,13 +45,24 @@ skipped: max_llm_symbols limit
 - Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
 - Headlines: No headlines returned
 
-### 5802.T — research score 71.92 / technical score 41.0
+### MSFT — research score 70.75 / technical score 63.0
+
+- Company: Microsoft Corporation
+- Sector / industry: Technology / Software - Infrastructure
+- Growth score: 90.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
+- Headlines: No headlines returned
+
+### 5802.T — research score 70.67 / technical score 41.0
 
 - Company: SUMITOMO ELECTRIC INDUSTRIES
 - Sector / industry: Consumer Cyclical / Auto Parts
 - Growth score: 90.0
 - Quality score: 73.33333333333333
-- Valuation heuristic: 83.33333333333333
+- Valuation heuristic: 78.33333333333333
 - Data status: ok
 - Risk notes: No headline data returned; this is not evidence that no catalyst exists
 - Headlines: No headlines returned
@@ -82,17 +82,6 @@ skipped: max_llm_symbols limit
 - Risk notes: No headline data returned; this is not evidence that no catalyst exists
 - Headlines: No headlines returned
 
-### AAPL — research score 69.94 / technical score 69.75
-
-- Company: Apple Inc.
-- Sector / industry: Technology / Consumer Electronics
-- Growth score: 80.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
-- Headlines: No headlines returned
-
 ### NVDA — research score 69.88 / technical score 49.5
 
 - Company: NVIDIA Corporation
@@ -107,6 +96,17 @@ skipped: max_llm_symbols limit
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
+
+### AAPL — research score 67.62 / technical score 60.5
+
+- Company: Apple Inc.
+- Sector / industry: Technology / Consumer Electronics
+- Growth score: 80.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
+- Headlines: No headlines returned
 
 ### 5801.T — research score 67.29 / technical score 40.0
 
@@ -123,7 +123,7 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### PLTR — research score 67.29 / technical score 57.5
+### PLTR — research score 66.04 / technical score 52.5
 
 - Company: Palantir Technologies Inc.
 - Sector / industry: Technology / Software - Infrastructure
@@ -133,6 +133,10 @@ skipped: max_llm_symbols limit
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk; No headline data returned; this is not evidence that no catalyst exists
 - Headlines: No headlines returned
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
 
 ## Method and limitations
 
