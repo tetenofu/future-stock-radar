@@ -3,9 +3,9 @@
 This is an evidence summary, not an automatic strategy change.
 The system does not silently rewrite scoring weights.
 
-- Evaluated observations: 76
-- return_1d: n=47, mean=-0.0216, median=-0.0174, win rate=0.191, worst=-0.1578
-- excess_return_1d: n=47, mean=-0.0179, median=-0.0136, win rate=0.255, worst=-0.1496
+- Evaluated observations: 107
+- return_1d: n=76, mean=-0.0064, median=-0.0122, win rate=0.355, worst=-0.1578
+- excess_return_1d: n=76, mean=-0.0082, median=-0.0098, win rate=0.368, worst=-0.1496
 
 ## Decision gate
 
