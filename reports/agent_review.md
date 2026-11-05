@@ -13,7 +13,7 @@
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Microsoft Corporation (MSFT) Outperforms with Record Quarter Driven by Azure Demand Surge | Meet the Only "Magnificent Seven" Stock That's Outperforming the S&P 500 and Nasdaq This Year (Hint: It's Not Nvidia) | Can Meta's Business Pay For Its Spending? | What Will Decide Microsoft Stock Over The Next Six Months? | Amazon’s Good Problems to Have Keep Me Hitting The Buy Button
+- Headlines: Google Joins The Surge Of Tech Layoffs | Not One Analyst Rates Microsoft a Sell. Is the Consensus View Right? | Voters Just Made Microsoft’s Data Centers More Valuable, a Wall Street Veteran Says | Ed Yardeni Says Slowing AI Boom Is Actually Bullish for Big Tech | These AI Names Sat Out the Midterm Rally. Now, the Losses Are Intensifying.
 
 ### 285A.T — research score 75.38 / technical score 36.5
 
@@ -30,28 +30,13 @@
 
 skipped: max_llm_symbols limit
 
-### META — research score 73.96 / technical score 52.5
-
-- Company: Meta Platforms, Inc.
-- Sector / industry: Communication Services / Internet Content & Information
-- Growth score: 90.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 60.0
-- Data status: ok
-- Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: AMD's AI megadeals with OpenAI and Meta just cost it $1.1 billion: Chart of the Day | How Tesla and SpaceX stocks are reacting to Democrats winning Congress | Wall St set for higher open as Democrats win Congress; data center stocks slide | Meet the Only "Magnificent Seven" Stock That's Outperforming the S&P 500 and Nasdaq This Year (Hint: It's Not Nvidia) | Can Meta's Business Pay For Its Spending?
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
-### 5802.T — research score 71.29 / technical score 43.5
+### 5802.T — research score 72.54 / technical score 43.5
 
 - Company: SUMITOMO ELECTRIC INDUSTRIES
 - Sector / industry: Consumer Cyclical / Auto Parts
 - Growth score: 90.0
 - Quality score: 73.33333333333333
-- Valuation heuristic: 78.33333333333333
+- Valuation heuristic: 83.33333333333333
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
 - Headlines: Japan Joins the Data Center Rush. These Stocks Can Benefit. | Sumitomo Electric Industries (TSE:5802) Stock Looks Cheap Based On Cash Flow | Sumitomo Electric Industries Ltd's Dividend Analysis | Buy this stock ahead of Q2 earnings: Mizuho | Meta’s new AI chips will begin production in September
@@ -60,44 +45,37 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### NVDA — research score 69.88 / technical score 49.5
+### META — research score 72.46 / technical score 46.5
 
-- Company: NVIDIA Corporation
-- Sector / industry: Technology / Semiconductors
-- Growth score: 100.0
+- Company: Meta Platforms, Inc.
+- Sector / industry: Communication Services / Internet Content & Information
+- Growth score: 90.0
 - Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
+- Valuation heuristic: 60.0
 - Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Wall Street reacts to the stunning election day Blue Wave: winners, losers and those in between | Stock market today: Dow jumps over 1,000 points, S&P 500 and Nasdaq gain after Democrats win control of Congress | This 1 Market Niche Is Growing at an Exponential Rate for Robinhood. That's Why I'm Bullish on HOOD Stock. | Why Rigetti Computing Slipped 23.4% Last Month | If a Stock Market Crash Comes in November, You'll Still Rest Easy Knowing You Bought This Dividend Stock
+- Risk notes: No automatic red flag from available fields; primary-source verification still required
+- Headlines: Meta's US bond sale drew $58B in orders. Now it's tapping Europe. | Google Joins The Surge Of Tech Layoffs | Snap Tumbles 11% as User Growth Miss and Sluggish Ad Sales Overshadow Return to Profit; Pinterest Dips, Meta Holds Steady | Vistra Cratered by 25% This Year: One Wall Street Team Says 110% Returns Ahead for Investors | These AI Names Sat Out the Midterm Rally. Now, the Losses Are Intensifying.
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
 
-### 6857.T — research score 69.29 / technical score 55.5
+### NVDA — research score 70.67 / technical score 46.0
 
-- Company: ADVANTEST CORP
-- Sector / industry: Technology / Semiconductor Equipment & Materials
+- Company: NVIDIA Corporation
+- Sector / industry: Technology / Semiconductors
 - Growth score: 100.0
 - Quality score: 93.33333333333333
-- Valuation heuristic: 28.333333333333332
+- Valuation heuristic: 43.333333333333336
 - Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo | Advantest (TSE:6857) Q2 Earnings Power Faces A Rich Valuation | Tech firms take fresh hit as disappointing earnings fan AI fears | Japan's Nikkei slumps up to 3% as tech stocks tumble on AI worries | Asian tech stocks slump as AI rout deepens on disappointing U.S. earnings
+- Risk notes: No automatic red flag from available fields; primary-source verification still required
+- Headlines: How the AI boom might affect your career: Fireworks AI CEO | America just voted against AI. That might be good. | Why one AI model won't rule the world: Fireworks AI CEO | SpaceX Lessors Look To Sell $40 Bil AI Deal. ARK Buys The Dip On SPCX Stock. | Stock Market Today: Dow Slips After Postelection Rally; Cava, Dutch Bros Plunge On Earnings News (Live Coverage)
 
-### AAPL — research score 69.0 / technical score 86.0
+**Optional local-model review**
 
-- Company: Apple Inc.
-- Sector / industry: Technology / Consumer Electronics
-- Growth score: 60.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: The AI sell-off saved Apple from a sell-off of its own | Why the Democrat blue wave could be a good thing for Apple stock | Meet the Only "Magnificent Seven" Stock That's Outperforming the S&P 500 and Nasdaq This Year (Hint: It's Not Nvidia) | What Will Decide Microsoft Stock Over The Next Six Months? | Company News for Nov 4, 2026
+skipped: max_llm_symbols limit
 
-### 6701.T — research score 68.17 / technical score 51.0
+### 6701.T — research score 69.67 / technical score 57.0
 
 - Company: NEC CORP
 - Sector / industry: Technology / Information Technology Services
@@ -108,35 +86,57 @@ skipped: max_llm_symbols limit
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
 - Headlines: NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand | New US-backed Southeast Asia data cable to pick NEC or Alcatel as supplier, developer says | NEC (TSE:6701) Stock Could Be 40% Overvalued On Cash Flow | Hassett defends Trump economy despite voter concerns on inflation
 
-**Optional local-model review**
+### AAPL — research score 69.0 / technical score 86.0
 
-skipped: max_llm_symbols limit
-
-### 5801.T — research score 67.92 / technical score 42.5
-
-- Company: FURUKAWA ELECTRIC CO
-- Sector / industry: Industrials / Electrical Equipment & Parts
-- Growth score: 90.0
-- Quality score: 67.5
-- Valuation heuristic: 71.66666666666667
-- Data status: partial
-- Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Oil, Bond Yields, Soft China Economic Data Undercut Asian Stock Markets | Tech, Oil Concerns Cramp Asian Stock Markets | Top 3 Japanese Undervalued Stocks To Watch In September 2026 | Rising Oil, Interest Rates Pressure Asian Stock Markets | Easing Oil Prices, Firming Tech Sector Undergird Asian Stock Markets
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
-### PLTR — research score 66.67 / technical score 55.0
-
-- Company: Palantir Technologies Inc.
-- Sector / industry: Technology / Software - Infrastructure
-- Growth score: 100.0
+- Company: Apple Inc.
+- Sector / industry: Technology / Consumer Electronics
+- Growth score: 60.0
 - Quality score: 93.33333333333333
-- Valuation heuristic: 18.333333333333332
+- Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Palantir Technologies (PLTR) Lifts Guidance As Fair Value Debate Comes Into Focus | Bank Stock Looks To Finance Breakout In Troubled Market | Top Bank Revamps Palantir Price Target After Stunning 96% Revenue Growth | Palantir Beats Q3 Estimates as Commercial Biz Takes the Lead: ETFs in Focus | ETFs Bought $108.2 Million of Palantir (PLTR) on Monday
+- Headlines: Apple seeks to raise up to $7 billion in seven-tranche bond offering | Stocks outside the AI trade are rallying — and Washington just added fuel | Qualcomm stock drops on rising memory pricing, supply challenges | Stock Market Today: Rotation Away From AI Stocks Increases as Money Flows to AI Landlords | Apple Stock Is Up 22%, but 1 Slowing Business Could Test That Valuation
+
+### 6525.T — research score 68.5 / technical score 34.0
+
+- Company: KOKUSAI ELECTRIC CORPORATION
+- Sector / industry: Technology / Semiconductor Equipment & Materials
+- Growth score: 100.0
+- Quality score: 80.0
+- Valuation heuristic: 60.0
+- Data status: partial
+- Risk notes: Technical trend score is weak
+- Headlines: Kokusai Electric (TSE:6525) Stock Still Looks Expensive On Current Earnings | Kokusai Electric And 2 Top Grid Stocks | Kokusai Electric Heads 3 Japanese Growth Stocks To Watch | KKR profits soar as it cashes in record amount of private equity bets | KKR Reshapes Portfolio With Exits And Energy Deals In Focus
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
+
+### 6857.T — research score 67.25 / technical score 39.0
+
+- Company: ADVANTEST CORP
+- Sector / industry: Technology / Semiconductor Equipment & Materials
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
+- Headlines: Tech companies hit by new AI worries on positive day for most markets | Japan’s large-cap exporters: Will the U.S. midterm sweep bring tariff relief? | Is Advantest (ATEYY) Outperforming Other Computer and Technology Stocks This Year? | Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo | Advantest (TSE:6857) Q2 Earnings Power Faces A Rich Valuation
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
+
+### AVGO — research score 67.12 / technical score 38.5
+
+- Company: Broadcom Inc.
+- Sector / industry: Technology / Semiconductors
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
+- Headlines: Marvell Stock Eyes 35% Upside After Lumentum Deal | Nvidia Just Dipped Below $200 for the First Time Since August | TSMC’s AI Opportunity Is Expanding. Here’s the Question That Matters for Its Stock Price | Why Did Amazon And Google Stock Rise? | Broadcom Stock Could Be Approaching a Major Turning Point. Here’s the Price Target
 
 **Optional local-model review**
 
