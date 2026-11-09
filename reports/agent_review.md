@@ -28,15 +28,15 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Analyst Calls Tech Stock Sell-Off 'Golden Buying Opportunity' | OpenAI Says It Will Pay for Its Data Centers’ Power After the Election Backlash | CRWV Poised for a Q3 Earnings Beat: Buy, Sell or Hold the Stock Now? | Healthcare and Staples Hold the Line Against Tech. The Time to Be Fearful When Others Are Greedy Has Arrived. | Nvidia Partner CoreWeave Ready To Report Q3 As AI Stocks Crumble; Nebius, Qualys Also Due
+- Headlines: Trump Urges Senate to Make Data Centers “Pay for Their Own Electricity.” Power Builders Stand to Gain | I’m Betting That The Post-Midterm Flight to Quality Will Kick Microsoft Into Gear | Microsoft Borrows at “10 Percentage Points Below CoreWeave.” Now It’s Backing Away From Neoclouds | A $1 Billion Fund Dumps These 2 Stocks | Risk-On: S&P 500 Surges Out of the Gate, Adds $1 Trillion in Market Value
 
-### 5802.T — research score 73.79 / technical score 43.5
+### 5802.T — research score 72.54 / technical score 43.5
 
 - Company: SUMITOMO ELECTRIC INDUSTRIES
 - Sector / industry: Consumer Cyclical / Auto Parts
 - Growth score: 90.0
 - Quality score: 73.33333333333333
-- Valuation heuristic: 88.33333333333333
+- Valuation heuristic: 83.33333333333333
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
 - Headlines: Japan Joins the Data Center Rush. These Stocks Can Benefit. | Sumitomo Electric Industries (TSE:5802) Stock Looks Cheap Based On Cash Flow | Sumitomo Electric Industries Ltd's Dividend Analysis | Buy this stock ahead of Q2 earnings: Mizuho | Meta’s new AI chips will begin production in September
@@ -45,18 +45,18 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### META — research score 73.21 / technical score 49.5
+### META — research score 71.88 / technical score 52.5
 
 - Company: Meta Platforms, Inc.
 - Sector / industry: Communication Services / Internet Content & Information
 - Growth score: 90.0
 - Quality score: 93.33333333333333
-- Valuation heuristic: 60.0
+- Valuation heuristic: 51.666666666666664
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Analyst Calls Tech Stock Sell-Off 'Golden Buying Opportunity' | Meta's former security chief Alex Stamos says giving Muse AI your passwords and finances is "totally insane" | Tech ETFs to Buy as AMD Tops Q3 Earnings, Data Center Revenues Up 97% | Healthcare and Staples Hold the Line Against Tech. The Time to Be Fearful When Others Are Greedy Has Arrived. | Why The Blue Tsunami Rattled AI Stocks As Microsoft, Google, Amazon Fall
+- Headlines: Exclusive: Former Meta and OpenAI Contractor Sama Liquidates, Citing Lawsuits | Market Chatter: Social Media Platforms Face EU Crackdown on Addictive Features | Meta Soars 5% as JPMorgan Picks It Over Alphabet for Its Analyst Focus List | Broadcom Faltered for a Year, Dropping Nearly 20%: This Wall Street Analyst Team Says 140% Gains Materialize Within 12 Months | META, AMZN Stocks Jump As JPMorgan Picks Pair Over Alphabet — Sees Stronger AI Returns, Cloud Growth
 
-### NVDA — research score 69.42 / technical score 41.0
+### NVDA — research score 70.04 / technical score 43.5
 
 - Company: NVIDIA Corporation
 - Sector / industry: Technology / Semiconductors
@@ -65,11 +65,22 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 43.333333333333336
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Nvidia, AMD, and Micron stocks lead chip sector higher following worst sell-off since 2020 | Stocks lost $2 trillion. The market is wrong about AI | Anthropic's valuation of $1.5T facing pushback from major investors | Stock Market Today: Dow Slides 500 Points Amid Surprise Jobs Report; Nvidia Leads Tech Rebound (Live Coverage) | Analyst Calls Tech Stock Sell-Off 'Golden Buying Opportunity'
+- Headlines: Nvidia live updates: Nvidia stock falls 5% as board investigates CEO's affair with alleged Chinese spy | Nvidia stock sinks 5% as chipmaker investigates CEO Jensen Huang's relationship with alleged Chinese spy | Is Jensen Huang's scandal the best threat to the AI trade? | Nvidia's black eye: One company isn't run by one person | Why Nvidia's board really needs to lay out Jensen Huang's succession plan
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
+
+### AAPL — research score 69.0 / technical score 86.0
+
+- Company: Apple Inc.
+- Sector / industry: Technology / Consumer Electronics
+- Growth score: 60.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk
+- Headlines: AI stocks have 2 major headwinds driving recent volatility | One nugget overlooked during the AI sell-off: token costs | iPhone Duo: Apple says 100,000 apps are now ready for folding phone as customers still struggle to buy it | Cramer’s Advice For Nvidia Makes Even More Sense Now As Stock Drops As Board Investigates CEO | Nvidia’s Stock Selloff, by the Numbers
 
 ### 6525.T — research score 68.5 / technical score 34.0
 
@@ -86,32 +97,6 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### AAPL — research score 68.38 / technical score 83.5
-
-- Company: Apple Inc.
-- Sector / industry: Technology / Consumer Electronics
-- Growth score: 60.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Analyst Calls Tech Stock Sell-Off 'Golden Buying Opportunity' | Apple Is Borrowing $7.5 Billion, Its First Bond Sale Since 2025 | Apple Is Now Worth $600 Billion More Than Nvidia | Dow Jones Futures Fall, AI Stocks Nvidia, Sandisk, CoreWeave, SpaceX Bounce; Tesla To End Cybertruck Production | Top Funds Feast On Shell, Microsoft, Palantir And 24 More Stocks
-
-### AVGO — research score 67.75 / technical score 41.0
-
-- Company: Broadcom Inc.
-- Sector / industry: Technology / Semiconductors
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Wall Street set to stabilise after multi-trillion dollar tech plunge | AMD Jumps 8%, Intel and NVIDIA Climb 5% as Chip Stocks Rebound From Worst Sell-Off Since 2020 | Marvell Drops 50% in One Month: This Analyst Stands Pat on 195% Gains Prediction | Cathie Wood Is Buying The Dip In Nvidia As She Adds $45.9 Million Of NVDA And Sells $119.7 Million Of Broadcom | Cathie Wood sells $120 million in AI stock, buys Nvidia
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
 ### 6857.T — research score 67.25 / technical score 39.0
 
 - Company: ADVANTEST CORP
@@ -121,7 +106,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
-- Headlines: Global shares skid after AI worries send Wall Street tumbling | Tech companies hit by new AI worries on positive day for most markets | Japan’s large-cap exporters: Will the U.S. midterm sweep bring tariff relief? | Is Advantest (ATEYY) Outperforming Other Computer and Technology Stocks This Year? | Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo
+- Headlines: Tech companies hit by new AI worries on positive day for most markets | Japan’s large-cap exporters: Will the U.S. midterm sweep bring tariff relief? | Is Advantest (ATEYY) Outperforming Other Computer and Technology Stocks This Year? | Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo | Advantest (TSE:6857) Q2 Earnings Power Faces A Rich Valuation
 
 **Optional local-model review**
 
@@ -137,6 +122,21 @@ skipped: max_llm_symbols limit
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
 - Headlines: NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand | New US-backed Southeast Asia data cable to pick NEC or Alcatel as supplier, developer says | NEC (TSE:6701) Stock Could Be 40% Overvalued On Cash Flow | Hassett defends Trump economy despite voter concerns on inflation
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
+
+### 5801.T — research score 66.67 / technical score 37.5
+
+- Company: FURUKAWA ELECTRIC CO
+- Sector / industry: Industrials / Electrical Equipment & Parts
+- Growth score: 90.0
+- Quality score: 67.5
+- Valuation heuristic: 71.66666666666667
+- Data status: partial
+- Risk notes: Technical trend score is weak
+- Headlines: US Elections, Crude Prices, Chip-Wreck Roil Asian Stock Markets | Oil, Bond Yields, Soft China Economic Data Undercut Asian Stock Markets | Tech, Oil Concerns Cramp Asian Stock Markets | Top 3 Japanese Undervalued Stocks To Watch In September 2026 | Rising Oil, Interest Rates Pressure Asian Stock Markets
 
 **Optional local-model review**
 
