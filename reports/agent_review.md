@@ -19,7 +19,33 @@
 
 skipped: max_llm_symbols limit
 
-### MSFT — research score 73.75 / technical score 75.0
+### META — research score 73.21 / technical score 49.5
+
+- Company: Meta Platforms, Inc.
+- Sector / industry: Communication Services / Internet Content & Information
+- Growth score: 90.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 60.0
+- Data status: ok
+- Risk notes: No automatic red flag from available fields; primary-source verification still required
+- Headlines: Meta's $27B Off-Balance-Sheet AI Deal Reminds Steve Eisman of Enron— Joseph Carlson Disagrees | Reddit Sinks 6% as Traffic Falls 13% on Google’s AI Overviews: “Not Traffic Drivers” | Meta Is Handing Its AI Data Center Buildout to an Amazon Veteran | Nvidia CEO Jensen Huang Resigns. The Stock Is Diving. | Alphabet and Meta Platforms Pay Dividends. Is Either of Them Worth Owning for Income?
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
+
+### AVGO — research score 71.67 / technical score 65.0
+
+- Company: Broadcom Inc.
+- Sector / industry: Technology / Semiconductors
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 28.333333333333332
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk
+- Headlines: AMD, Broadcom stocks jump as Nvidia CEO Jensen Huang resigns | Jensen Huang Just Resigned From Nvidia. If You Have $5,000, These Are the 3 Tech Stocks to Buy | Nvidia, AMD, CoreWeave, Nebius, Tesla, Strategy, and More Stocks That Explain Today’s Market | AMD Bounced 10% but Is Still Down 32% in a Month. Wedbush Sees $600 | AMD Stock Gets Upgrade. What It Says About the Future of the AI Trade.
+
+### MSFT — research score 70.31 / technical score 61.25
 
 - Company: Microsoft Corporation
 - Sector / industry: Technology / Software - Infrastructure
@@ -28,22 +54,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Market Chatter: Anthropic IPO Valuation Could Rise to $1.5 Trillion on Strong Demand | Anthropic's new Claude product drop just sent a message to these 3 tech stocks | Why Anthropic Cares More About Cash Than Its $1.5 Trillion Price Tag | Dow Jones Futures Rise, Techs Jump On CoreWeave Earnings; Look For This Bullish Market Signal | Only One Analyst Says Sell Micron, and It’s a Strong Sell. Should Investors Listen?
-
-### META — research score 71.12 / technical score 49.5
-
-- Company: Meta Platforms, Inc.
-- Sector / industry: Communication Services / Internet Content & Information
-- Growth score: 90.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 51.666666666666664
-- Data status: ok
-- Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Meta Fined by Brazil Electoral Court for Allegedly Failing to Provide Equal Content During Presidential Campaign | Top 3 Value Stocks To Watch In November 2026 | David Tepper Bought CoreWeave Before It Fell 51%. Is He Wrong, or Early? | 3 Great Founder Led Stocks To Own In November 2026 | Data Centers Will Prevail Despite All the Opposition. How to Play It With Options.
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
+- Headlines: Jensen Huang Is Out at Nvidia. Who Could Replace Him? | Meta Is Handing Its AI Data Center Buildout to an Amazon Veteran | Recapping Anthropic’s 2026 – and how it’s just getting started | Jim Cramer Is Bullish on These 5 Stocks Amid Nvidia Controversy | 5 Shocking Facts About Colette Kress, Nvidia’s New Interim CEO
 
 ### NVDA — research score 70.04 / technical score 43.5
 
@@ -54,7 +65,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 43.333333333333336
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Stock market today: Dow, S&P 500, Nasdaq rise as Nvidia stock recovers | Nvidia stock rebounds, chip stocks surge as CoreWeave earnings boost AI trade | 'Icarus' rise and fall': Analyst downgrades Nvidia stock amid Jensen Huang woes, highlights risks | Why open-source AI models aren't actually cheaper to run: Vinod Khosla | Why CoreWeave Sparked 'Sigh Of Relief In The AI Market'
+- Headlines: Who is Colette Kress, Nvidia's new interim CEO? | AMD, Broadcom stocks jump as Nvidia CEO Jensen Huang resigns | Jensen Huang vs. Steve Jobs: Can Nvidia also thrive without its visionary? | Planning Nvidia investigations, top Democrats tell Trump administration to 'preserve all records' | Why replacing Jensen Huang is an impossible task
 
 **Optional local-model review**
 
@@ -75,7 +86,22 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### AAPL — research score 69.38 / technical score 87.5
+### 6525.T — research score 69.12 / technical score 36.5
+
+- Company: KOKUSAI ELECTRIC CORPORATION
+- Sector / industry: Technology / Semiconductor Equipment & Materials
+- Growth score: 100.0
+- Quality score: 80.0
+- Valuation heuristic: 60.0
+- Data status: ok
+- Risk notes: Technical trend score is weak
+- Headlines: Asian Stock Markets Rise Amid CoreWeave Earnings-Trigged AI Optimism | Kokusai Electric (TSE:6525) Stock Still Looks Rich Against Cash Flow Value | Tech Rebound, Sinking Crude Boost Asian Stock Markets | Kokusai Electric (TSE:6525) Stock Still Looks Expensive On Current Earnings | Kokusai Electric And 2 Top Grid Stocks
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
+
+### AAPL — research score 68.62 / technical score 84.5
 
 - Company: Apple Inc.
 - Sector / industry: Technology / Consumer Electronics
@@ -84,22 +110,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: How Much Capital Gains Tax Does a 61-Year-Old Owe on $750,000 of Inherited Apple Stock? | Buy, Sell, or Hold? Wednesday’s Top Upgrades and Downgrades: Akamai Technologies, Apple, BILL Holdings, Corning, Form Factor, Guidewire Software, NVIDIA, Riot Platforms, Toast, and More | Kai-Fu Lee Questions Soaring AI Valuations | What State Street Tech Select SPDR (XLK) Sold: Apple Leads on Nov. 9 | What ProShares Ultra S&P500 2x Shares (SSO) Sold: Apple Leads on Monday
-
-### AVGO — research score 69.04 / technical score 54.5
-
-- Company: Broadcom Inc.
-- Sector / industry: Technology / Semiconductors
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 28.333333333333332
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Goldman Sachs calls chip stocks 'oversold.' Here are the names it says to buy. | NVIDIA Rises 4% Despite Baird Downgrade and Huang Uncertainty; AMD Climbs 5%, Broadcom Gains 4% | MU, AMD, AVGO, Other Chip Stocks Surge As CoreWeave Earnings Reignite AI Trade — Nasdaq-100 Futures Jump | Goldman Sees Anthropic Revenue at “$685B by 2030.” Broadcom Is Tied to $161 Billion in Lease Deals | 4 Dividend Stocks That Can Thrive Under a Democratic Congress
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
+- Headlines: Jensen Huang vs. Steve Jobs: Can Nvidia also thrive without its visionary? | Tony Robbins: How to make yourself irreplaceable in the AI era | Tony Robbins: 4 rules the world's greatest investors follow | Apple’s Growth Now Rides on Price Hikes. The Problem: “There’s a Wall” per Alex Kantrowitz | Nvidia CEO Jensen Huang Resigns. The Stock Is Diving.
 
 ### 6701.T — research score 67.67 / technical score 49.0
 
@@ -110,7 +121,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 78.33333333333333
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: NEC (TSE:6701) Stock May Be 13% Above Fair Value On Cash Flow | NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand | New US-backed Southeast Asia data cable to pick NEC or Alcatel as supplier, developer says | NEC (TSE:6701) Stock Could Be 40% Overvalued On Cash Flow
+- Headlines: Qualcomm CEO on SpaceX deal: 'It's a great partnership' that will drive 'innovation' | NEC (TSE:6701) Stock May Be 13% Above Fair Value On Cash Flow | NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand | New US-backed Southeast Asia data cable to pick NEC or Alcatel as supplier, developer says
 
 **Optional local-model review**
 
@@ -126,21 +137,6 @@ skipped: max_llm_symbols limit
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
 - Headlines: Tech companies hit by new AI worries on positive day for most markets | Japan’s large-cap exporters: Will the U.S. midterm sweep bring tariff relief? | Is Advantest (ATEYY) Outperforming Other Computer and Technology Stocks This Year? | Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo | Advantest (TSE:6857) Q2 Earnings Power Faces A Rich Valuation
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
-### 6525.T — research score 65.38 / technical score 36.5
-
-- Company: KOKUSAI ELECTRIC CORPORATION
-- Sector / industry: Technology / Semiconductor Equipment & Materials
-- Growth score: 100.0
-- Quality score: 80.0
-- Valuation heuristic: 45.0
-- Data status: ok
-- Risk notes: Technical trend score is weak
-- Headlines: Asian Stock Markets Rise Amid CoreWeave Earnings-Trigged AI Optimism | Kokusai Electric (TSE:6525) Stock Still Looks Rich Against Cash Flow Value | Tech Rebound, Sinking Crude Boost Asian Stock Markets | Kokusai Electric (TSE:6525) Stock Still Looks Expensive On Current Earnings | Kokusai Electric And 2 Top Grid Stocks
 
 **Optional local-model review**
 
