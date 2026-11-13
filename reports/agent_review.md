@@ -28,13 +28,13 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 60.0
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Meta's $27B Off-Balance-Sheet AI Deal Reminds Steve Eisman of Enron— Joseph Carlson Disagrees | Reddit Sinks 6% as Traffic Falls 13% on Google’s AI Overviews: “Not Traffic Drivers” | Meta Is Handing Its AI Data Center Buildout to an Amazon Veteran | Nvidia CEO Jensen Huang Resigns. The Stock Is Diving. | Alphabet and Meta Platforms Pay Dividends. Is Either of Them Worth Owning for Income?
+- Headlines: As Meta Platforms Continues To Weaken, A Bearish Trade May Be In Order | AMD’s Path to $700 Just Got Much Easier as Enterprise and Hyperscaler Diversification Tailwinds Rise | Anthropic IPO: Buy Day One Or Wait? | State Street Comm Services SPDR (XLC) Adds Meta and Alphabet on Nov. 11 | 55 ETFs Add to Meta Platforms (META) on Nov. 11
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
 
-### AVGO — research score 71.67 / technical score 65.0
+### AVGO — research score 71.04 / technical score 62.5
 
 - Company: Broadcom Inc.
 - Sector / industry: Technology / Semiconductors
@@ -43,7 +43,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 28.333333333333332
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: AMD, Broadcom stocks jump as Nvidia CEO Jensen Huang resigns | Jensen Huang Just Resigned From Nvidia. If You Have $5,000, These Are the 3 Tech Stocks to Buy | Nvidia, AMD, CoreWeave, Nebius, Tesla, Strategy, and More Stocks That Explain Today’s Market | AMD Bounced 10% but Is Still Down 32% in a Month. Wedbush Sees $600 | AMD Stock Gets Upgrade. What It Says About the Future of the AI Trade.
+- Headlines: NVIDIA Rises 2% Despite Michael Burry Adding to Chip Shorts; AMD Retreats 3%, Broadcom Slides 2% | Nvidia’s New CEO Colette Kress Seems Tougher on OpenAI Than Huang Was | Jensen Huang is Out as CEO, Nvidia Down 25% in a Month: Wall Street’s Highest Target Price Reaffirmed as Major Desks Slash Prices, Predicting 210% Gains | Broadcom And 2 High Growth Stocks To Watch | NVIDIA Leadership Crisis Opens Door for Chip Rivals? ETFs in Focus
 
 ### MSFT — research score 70.31 / technical score 61.25
 
@@ -54,7 +54,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Jensen Huang Is Out at Nvidia. Who Could Replace Him? | Meta Is Handing Its AI Data Center Buildout to an Amazon Veteran | Recapping Anthropic’s 2026 – and how it’s just getting started | Jim Cramer Is Bullish on These 5 Stocks Amid Nvidia Controversy | 5 Shocking Facts About Colette Kress, Nvidia’s New Interim CEO
+- Headlines: Microsoft updates on outage disrupting email, Outlook, Teams, and Copilot for users | Nvidia market value sinks, Microsoft races to fix outlook after outage, PPI data read on inflation | Cerebras shares jump 16% as earnings beat and Microsoft deal fuel raised outlook | Not Apple. Not Microsoft. This "Magnificent Seven" Stock Is My Top Tech Buy for 2027. | CFOs On the Move: Week ending Nov. 13
 
 ### NVDA — research score 70.04 / technical score 43.5
 
@@ -65,13 +65,13 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 43.333333333333336
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Who is Colette Kress, Nvidia's new interim CEO? | AMD, Broadcom stocks jump as Nvidia CEO Jensen Huang resigns | Jensen Huang vs. Steve Jobs: Can Nvidia also thrive without its visionary? | Planning Nvidia investigations, top Democrats tell Trump administration to 'preserve all records' | Why replacing Jensen Huang is an impossible task
+- Headlines: Stock market today: S&P 500, Nasdaq turn lower as  wholesale inflation rises, Nvidia stock falls | Here's what happened to Nvidia in 2 days | Jensen Huang scandal trail leads to Alibaba, the king of free Chinese AI: Chart of the Day | The Nvidia scandal has hidden upside potential for the AI trade | Nvidia market value sinks, Microsoft races to fix outlook after outage, PPI data read on inflation
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
 
-### 5802.T — research score 69.79 / technical score 37.5
+### 5802.T — research score 69.17 / technical score 35.0
 
 - Company: SUMITOMO ELECTRIC INDUSTRIES
 - Sector / industry: Consumer Cyclical / Auto Parts
@@ -101,18 +101,33 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### AAPL — research score 68.62 / technical score 84.5
+### 6857.T — research score 68.12 / technical score 42.5
+
+- Company: ADVANTEST CORP
+- Sector / industry: Technology / Semiconductor Equipment & Materials
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk
+- Headlines: Tech companies hit by new AI worries on positive day for most markets | Japan’s large-cap exporters: Will the U.S. midterm sweep bring tariff relief? | Is Advantest (ATEYY) Outperforming Other Computer and Technology Stocks This Year? | Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo | Advantest (TSE:6857) Q2 Earnings Power Faces A Rich Valuation
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
+
+### AAPL — research score 66.54 / technical score 84.5
 
 - Company: Apple Inc.
 - Sector / industry: Technology / Consumer Electronics
 - Growth score: 60.0
 - Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
+- Valuation heuristic: 28.333333333333332
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Jensen Huang vs. Steve Jobs: Can Nvidia also thrive without its visionary? | Tony Robbins: How to make yourself irreplaceable in the AI era | Tony Robbins: 4 rules the world's greatest investors follow | Apple’s Growth Now Rides on Price Hikes. The Problem: “There’s a Wall” per Alex Kantrowitz | Nvidia CEO Jensen Huang Resigns. The Stock Is Diving.
+- Headlines: Not Apple. Not Microsoft. This "Magnificent Seven" Stock Is My Top Tech Buy for 2027. | Apple (AAPL) Puts Tim Cook At The Center Of A Surprise CEO Search | Nvidia Lost the World’s Most Valuable Company Title. History Shows How Rarely the Crown Comes Back | Trump Wants Apple’s Tim Cook to Run Nvidia | This Week In Cloud AI - Data Center Boom Fueled By AI Advancements
 
-### 6701.T — research score 67.67 / technical score 49.0
+### 6701.T — research score 66.29 / technical score 43.5
 
 - Company: NEC CORP
 - Sector / industry: Technology / Information Technology Services
@@ -122,21 +137,6 @@ skipped: max_llm_symbols limit
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
 - Headlines: Qualcomm CEO on SpaceX deal: 'It's a great partnership' that will drive 'innovation' | NEC (TSE:6701) Stock May Be 13% Above Fair Value On Cash Flow | NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand | New US-backed Southeast Asia data cable to pick NEC or Alcatel as supplier, developer says
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
-### 6857.T — research score 67.25 / technical score 39.0
-
-- Company: ADVANTEST CORP
-- Sector / industry: Technology / Semiconductor Equipment & Materials
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
-- Headlines: Tech companies hit by new AI worries on positive day for most markets | Japan’s large-cap exporters: Will the U.S. midterm sweep bring tariff relief? | Is Advantest (ATEYY) Outperforming Other Computer and Technology Stocks This Year? | Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo | Advantest (TSE:6857) Q2 Earnings Power Faces A Rich Valuation
 
 **Optional local-model review**
 
