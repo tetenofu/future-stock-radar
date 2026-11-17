@@ -19,7 +19,7 @@
 
 skipped: max_llm_symbols limit
 
-### META — research score 74.21 / technical score 53.5
+### META — research score 72.46 / technical score 46.5
 
 - Company: Meta Platforms, Inc.
 - Sector / industry: Communication Services / Internet Content & Information
@@ -28,22 +28,26 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 60.0
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Broadcom’s Quiet 8% November Move Could Ramp Up Very Quickly in This Volatile Climate and I’m Buying | Google and Meta Tell Two Different Stories as Search Rebounds | A $4.1 Billion Fund Dumps These 2 Stocks | Arm Stock Could Be Worth Much More if These 3 Catalysts Materialize | OpenAI Debuts ChatGPT Payment Method
+- Headlines: Exclusive-Trump's China data center curb advances despite Amazon, Google, Meta lobbying | AMD Expects Its CPU Revenue to Double in 2027. Is NVIDIA’s Turmoil AMD’s Opening? | Glenview Makes Two Very Different Moves on CVS and Meta | Brad Gerstner Dumps These 3 Stocks | Fed Chair Kevin Warsh Outlined 3 Possible Futures for AI Yesterday. One Could Be Devastating for Stocks
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
 
-### AVGO — research score 71.04 / technical score 62.5
+### 5802.T — research score 70.92 / technical score 32.0
 
-- Company: Broadcom Inc.
-- Sector / industry: Technology / Semiconductors
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 28.333333333333332
+- Company: SUMITOMO ELECTRIC INDUSTRIES
+- Sector / industry: Consumer Cyclical / Auto Parts
+- Growth score: 90.0
+- Quality score: 73.33333333333333
+- Valuation heuristic: 88.33333333333333
 - Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: AMD, Broadcom stocks sink on tighter US chip rules, CoreWeave and Nebius shares drop | Broadcom’s Quiet 8% November Move Could Ramp Up Very Quickly in This Volatile Climate and I’m Buying | Jensen Huang Reportedly Considers Returning To Nvidia: FT | Chip stocks fall on US semiconductor restrictions: AlphaCheck | Stocks to Watch: Robinhood, Nvidia, SpaceX, L3Harris
+- Risk notes: Technical trend score is weak
+- Headlines: European Stock Indexes Mixed at Start of Crucial Week | Sumitomo Electric Industries Stock Gets A Lift From Raised Outlook | Japan Joins the Data Center Rush. These Stocks Can Benefit. | Sumitomo Electric Industries (TSE:5802) Stock Looks Cheap Based On Cash Flow | Sumitomo Electric Industries Ltd's Dividend Analysis
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
 
 ### 5803.T — research score 70.62 / technical score 37.5
 
@@ -60,31 +64,16 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### 5802.T — research score 70.42 / technical score 35.0
+### AVGO — research score 70.42 / technical score 60.0
 
-- Company: SUMITOMO ELECTRIC INDUSTRIES
-- Sector / industry: Consumer Cyclical / Auto Parts
-- Growth score: 90.0
-- Quality score: 73.33333333333333
-- Valuation heuristic: 83.33333333333333
-- Data status: ok
-- Risk notes: Technical trend score is weak
-- Headlines: European Stock Indexes Mixed at Start of Crucial Week | Sumitomo Electric Industries Stock Gets A Lift From Raised Outlook | Japan Joins the Data Center Rush. These Stocks Can Benefit. | Sumitomo Electric Industries (TSE:5802) Stock Looks Cheap Based On Cash Flow | Sumitomo Electric Industries Ltd's Dividend Analysis
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
-### MSFT — research score 70.31 / technical score 61.25
-
-- Company: Microsoft Corporation
-- Sector / industry: Technology / Software - Infrastructure
-- Growth score: 90.0
+- Company: Broadcom Inc.
+- Sector / industry: Technology / Semiconductors
+- Growth score: 100.0
 - Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
+- Valuation heuristic: 28.333333333333332
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Microsoft Pinpoints What Knocked Outlook Offline Worldwide | Is an Equal-Weight S&P 500 Fund Safer Right Now Than the One You Own? | One Magnificent Seven Stock Looks Ready for Its Next Big Move | IBM vs. Jabil: Which Stock is Better Positioned for AI Growth Now? | Will Oracle's Debt-Funded Data Center Buildout Weigh on the Stock Now?
+- Headlines: Three stocks with the highest exposure to Nvidia earnings | Prediction: This Will Be Broadcom’s Stock Price by the End of 2028 | Broadcom’s AI Revenue is Contracted to Double in 2027, So I’m Buying | Nvidia Isn’t the Whole AI Story. This Stock Could Prove It | Cathie Wood and 14 Other Big Funds Bought Broadcom. It’s 33% Below Its High. Bargain or Trap?
 
 ### NVDA — research score 70.04 / technical score 43.5
 
@@ -95,13 +84,24 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 43.333333333333336
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Nvidia live updates: Interim CEO Kress prepares for Q3 earnings, with Huang reportedly planning comeback | Nvidia's Q3 results will be no ordinary earnings day. Here's what investors need to see. | Could Jensen Huang actually make a comeback as Nvidia CEO? | Jensen Huang was a great CEO, but he's not untouchable | Should Nvidia stock be a buy ahead of earnings?
+- Headlines: Why today's a pivotal test for the AI trade | Nvidia's Colette Kress faces some serious pressure ahead of Q3 earnings | Why analysts are calling Nvidia's stock valuation 'draconian' | George Soros cut Nvidia holding by 20% before the scandal | Trump-Xi meeting looms as US tightens AI chip restrictions on China
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
 
-### 6525.T — research score 69.12 / technical score 36.5
+### MSFT — research score 69.38 / technical score 57.5
+
+- Company: Microsoft Corporation
+- Sector / industry: Technology / Software - Infrastructure
+- Growth score: 90.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk
+- Headlines: JPMorgan, Microsoft, United, FAA service outages: What exactly is going on? | Exclusive-Trump's China data center curb advances despite Amazon, Google, Meta lobbying | Constellation Energy vs. Vistra: Which Utilities Stock Is a Better Buy for 2027? | Sony defeats £2 billion UK claim over PlayStation Store pricing | Fed Chair Kevin Warsh Outlined 3 Possible Futures for AI Yesterday. One Could Be Devastating for Stocks
+
+### 6525.T — research score 68.5 / technical score 34.0
 
 - Company: KOKUSAI ELECTRIC CORPORATION
 - Sector / industry: Technology / Semiconductor Equipment & Materials
@@ -116,22 +116,7 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### 6857.T — research score 68.12 / technical score 42.5
-
-- Company: ADVANTEST CORP
-- Sector / industry: Technology / Semiconductor Equipment & Materials
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: European Stock Indexes Mixed at Start of Crucial Week | Asian Equities Drop as U.S. Chip Selloff Spills Over | Asian chip stocks slide ahead of Nvidia earnings | Tech companies hit by new AI worries on positive day for most markets | Japan’s large-cap exporters: Will the U.S. midterm sweep bring tariff relief?
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
-### AAPL — research score 67.62 / technical score 80.5
+### AAPL — research score 67.0 / technical score 78.0
 
 - Company: Apple Inc.
 - Sector / industry: Technology / Consumer Electronics
@@ -140,7 +125,22 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Is an Equal-Weight S&P 500 Fund Safer Right Now Than the One You Own? | Trump Says Jensen Huang Did Not Put National Security at Risk | Is Apple Losing Its Memory? | Apple (AAPL) Picks Core Foldable Glass Supplier For iPhone Duo | Wall Street’s 5 Safest Dividend Stocks Built for Any Market
+- Headlines: George Soros and 21 Other Big Funds Sold Apple Last Quarter, While 13 Bought. Who’s Right? | What Does SMCI Stock Offer That HP Does Not? | Apple Is Now the World’s Largest Company. Time to Buy the Stock? | Arm Could Become a Much Bigger AI Winner by 2030. Here’s the Case | Netflix Stock Down 47%: Too Early To Buy?
+
+### 6701.T — research score 66.29 / technical score 43.5
+
+- Company: NEC CORP
+- Sector / industry: Technology / Information Technology Services
+- Growth score: 70.0
+- Quality score: 73.33333333333333
+- Valuation heuristic: 78.33333333333333
+- Data status: ok
+- Risk notes: No automatic red flag from available fields; primary-source verification still required
+- Headlines: Qualcomm CEO Cristiano Amon on fueling the AI boom | Qualcomm CEO on SpaceX deal: 'It's a great partnership' that will drive 'innovation' | NEC (TSE:6701) Stock May Be 13% Above Fair Value On Cash Flow | NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand
+
+**Optional local-model review**
+
+skipped: max_llm_symbols limit
 
 ## Method and limitations
 
