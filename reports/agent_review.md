@@ -19,7 +19,7 @@
 
 skipped: max_llm_symbols limit
 
-### META — research score 72.46 / technical score 46.5
+### META — research score 73.21 / technical score 49.5
 
 - Company: Meta Platforms, Inc.
 - Sector / industry: Communication Services / Internet Content & Information
@@ -28,20 +28,9 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 60.0
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Should You Buy the Worst-Performing Magnificent Seven Stock of 2026 Before 2027? | What Does Amazon's Falling Multiple Really Say? | Nevoya developing Arizona-California I-10 electric truck route | Anthropic IPO: Is Its Customer Risk Smaller Than It Looks? | Can Qualcomm's Deal With Cirrascale Boost its AI Growth Prospects?
+- Headlines: David Tepper and 27 Other Big Funds Bought Oracle Last Quarter, While 12 Sold. Who’s Right? | Apple Stock Polishes Breakout As Nvidia-Led AI Boom Gets Wake-Up Call | What 1 Big Trigger Could Make Nvidia Stock Jump By Dec 31? | STMicroelectronics Sees Data Center Revenue More Than Doubling in 2027 as AI Demand Surges | Shareholder Lawsuits Stall Meta's Class C Share Plan
 
-### AVGO — research score 71.04 / technical score 62.5
-
-- Company: Broadcom Inc.
-- Sector / industry: Technology / Semiconductors
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 28.333333333333332
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: AMD, Broadcom, CoreWeave stocks mixed on Nvidia Q3 earnings beat | Here’s Why Technology Spending Over the Next 3 Years Could Make Broadcom (AVGO) a Winner | Nvidia Is Well Off Its Highs, but Our Model Still Sees 29% Upside | How Broadcom’s (AVGO) Anthropic Equipment Leases Link AI Growth to Financing | How Much Could You Lose Holding Qualcomm Stock?
-
-### 5802.T — research score 70.92 / technical score 32.0
+### 5802.T — research score 71.67 / technical score 35.0
 
 - Company: SUMITOMO ELECTRIC INDUSTRIES
 - Sector / industry: Consumer Cyclical / Auto Parts
@@ -56,6 +45,17 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
+### AVGO — research score 71.04 / technical score 62.5
+
+- Company: Broadcom Inc.
+- Sector / industry: Technology / Semiconductors
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 28.333333333333332
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk
+- Headlines: Not AMD. Not Intel. This Is the Chip Stock Wall Street Is Underestimating | Anthropic’s IPO puts AI’s circular financing boom to the test | Nvidia, AMD, Micron stocks lead chip sector higher amid Anthropic IPO optimism | Is Texas Instruments' Sales Boom Its Biggest Risk? | NVIDIA Posted $115.8 Billion in Revenue. Why Is the Stock Still Down 27% in a Month?
+
 ### 5803.T — research score 70.62 / technical score 37.5
 
 - Company: FUJIKURA
@@ -65,13 +65,13 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 58.333333333333336
 - Data status: ok
 - Risk notes: Technical trend score is weak
-- Headlines: Fujikura (TSE:5803) Following Raised Outlook And Dividend Looks Cheap Or Still Pricey | Fujikura raises full-year forecast after 1H operating profit more than doubles | Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo | Fujikura (TSE:5803) Stock Looks Stretched Against Its Cash Flow Value | Tech Optimism, Oil Outlook Lifts Asian Stock Markets
+- Headlines: Fujikura (TSE:5803) Stock Could Be Cheap Based On Cash Flow | Fujikura (TSE:5803) Following Raised Outlook And Dividend Looks Cheap Or Still Pricey | Fujikura raises full-year forecast after 1H operating profit more than doubles | Kioxia Fell 13% and SoftBank Fell 7% as the Blue Wave Hit Tokyo | Fujikura (TSE:5803) Stock Looks Stretched Against Its Cash Flow Value
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
 
-### NVDA — research score 70.04 / technical score 43.5
+### NVDA — research score 69.42 / technical score 41.0
 
 - Company: NVIDIA Corporation
 - Sector / industry: Technology / Semiconductors
@@ -80,13 +80,13 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 43.333333333333336
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Why Nvidia doesn't need a 'big splashy hire' to replace Jensen Huang as CEO | Nvidia's next CEO should be hired internally, Jeff Bezos advises | Tech stocks rise as investors shift focus to Anthropic IPO: AlphaCheck | Colette Kress should not be Nvidia's permanent CEO, analyst says. Here's why. | 3 numbers explaining Nvidia's post-earnings stock move
+- Headlines: Nvidia, AMD, Micron stocks lead chip sector higher amid Anthropic IPO optimism | Nvidia interim CEO says 'we've got this' amid leadership transition | Stalemates over semiconductors and rare earth minerals appear little changed as Trump heads home from China | AI giant Anthropic shares set to trade after record-breaking IPO | Coherent shares rise after board approves $2 billion buyback program
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
 
-### MSFT — research score 68.62 / technical score 54.5
+### MSFT — research score 69.38 / technical score 57.5
 
 - Company: Microsoft Corporation
 - Sector / industry: Technology / Software - Infrastructure
@@ -95,9 +95,9 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Major tech outages raise new cybersecurity concerns | Tech outages are disrupting everything. Are humans to blame? | Planes, banks and the NSA all went down in one week | Why does the internet keep breaking? It’s not the end of the world – it might be something scarier | Should You Buy the Worst-Performing Magnificent Seven Stock of 2026 Before 2027?
+- Headlines: GTA VI: Why the 13-year wait could be worth $8 billion | The Fed Just Warned About a Hidden $3 Trillion AI Risk. Here’s How It Can Spread Beyond Tech Stocks | What Could Derail Take-Two Stock? | Microsoft (MSFT) Secures New AI Chip Supply Deal For Azure Growth | The outages keep coming. Some Americans are preparing for a collapse.
 
-### 6525.T — research score 68.5 / technical score 34.0
+### 6525.T — research score 67.88 / technical score 31.5
 
 - Company: KOKUSAI ELECTRIC CORPORATION
 - Sector / industry: Technology / Semiconductor Equipment & Materials
@@ -112,7 +112,7 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### AAPL — research score 67.62 / technical score 80.5
+### AAPL — research score 67.0 / technical score 78.0
 
 - Company: Apple Inc.
 - Sector / industry: Technology / Consumer Electronics
@@ -121,18 +121,18 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Major tech outages raise new cybersecurity concerns | Why does the internet keep breaking? It’s not the end of the world – it might be something scarier | Should You Buy the Worst-Performing Magnificent Seven Stock of 2026 Before 2027? | AAPL Stock Alert: Samsung Could Win a Bigger Apple Memory Deal | Insulet downgraded, Tandem Diabetes upgraded: Wall Street's top analyst calls
+- Headlines: Apple Stock Polishes Breakout As Nvidia-Led AI Boom Gets Wake-Up Call | Some Fed Officials Wanted to Hike in October. A Half-Point Hike Is on the Table. | If Apple Reaches $400, Your $5,000 Investment Would Be Worth This Much | Anthropic goes public as AI bug hunters push cybersecurity stocks higher: Chart of the Day | STMicroelectronics Sees Data Center Revenue More Than Doubling in 2027 as AI Demand Surges
 
-### 6701.T — research score 66.29 / technical score 43.5
+### 6857.T — research score 66.0 / technical score 34.0
 
-- Company: NEC CORP
-- Sector / industry: Technology / Information Technology Services
-- Growth score: 70.0
-- Quality score: 73.33333333333333
-- Valuation heuristic: 78.33333333333333
+- Company: ADVANTEST CORP
+- Sector / industry: Technology / Semiconductor Equipment & Materials
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
 - Data status: ok
-- Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Qualcomm CEO Cristiano Amon on fueling the AI boom | Qualcomm CEO on SpaceX deal: 'It's a great partnership' that will drive 'innovation' | NEC (TSE:6701) Stock May Be 13% Above Fair Value On Cash Flow | NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand
+- Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
+- Headlines: Advantest Stocks Rise 4.56% in Tokyo as Nvidia's Outlook Lifts Chip Testers | Advantest Stocks Tumble 11.12% as Tokyo Chip Selloff Drags Nikkei Below 60,00 | Teradyne Stocks Drop 6.14% as Advantest's 11% Tokyo Plunge Hits Chip Testers | European Stock Indexes Mixed at Start of Crucial Week | Asian Equities Drop as U.S. Chip Selloff Spills Over
 
 **Optional local-model review**
 
