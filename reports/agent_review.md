@@ -13,7 +13,7 @@
 - Valuation heuristic: 71.66666666666667
 - Data status: ok
 - Risk notes: Technical trend score is weak
-- Headlines: European Tech Stocks Tumble as AI Selloff Intensifies | SK Hynix to Be Kioxia’s Top Shareholder | SK Hynix weighs converting Kioxia bonds to shares, report says | Japan’s Nikkei enters bear market as AI rout sends chip shares into sharp retreat | Investors poised for US gridlock as Democrats projected to win control of House
+- Headlines: Kioxia Stocks Plunge 11.66% as Flash Memory Boom Meets Flat Next-Quarter Guide | European Tech Stocks Tumble as AI Selloff Intensifies | SK Hynix to Be Kioxia’s Top Shareholder | SK Hynix weighs converting Kioxia bonds to shares, report says | Japan’s Nikkei enters bear market as AI rout sends chip shares into sharp retreat
 
 **Optional local-model review**
 
@@ -34,22 +34,7 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### NVDA — research score 72.75 / technical score 41.0
-
-- Company: NVIDIA Corporation
-- Sector / industry: Technology / Semiconductors
-- Growth score: 100.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 56.666666666666664
-- Data status: ok
-- Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Nvidia stock extends 6-day losing streak, as AMD, Broadcom lead chip sector lower | Nvidia's troubles mount as China chip sales face scrutiny | Chip stocks lead tech lower, Anthropic stock drops: AlphaCheck | The post earnings slide in Nvidia stock is getting uglier by the day | Apple Stock Polishes Breakout As Nvidia-Led AI Boom Gets Wake-Up Call
-
-**Optional local-model review**
-
-skipped: max_llm_symbols limit
-
-### META — research score 72.46 / technical score 46.5
+### META — research score 72.96 / technical score 48.5
 
 - Company: Meta Platforms, Inc.
 - Sector / industry: Communication Services / Internet Content & Information
@@ -58,7 +43,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 60.0
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Anthropic just went public. Here's what SpaceX and Facebook IPOs tell us about where the stock goes next. | Apple Stock Polishes Breakout As Nvidia-Led AI Boom Gets Wake-Up Call | Billionaire Dan Loeb Exited Amazon and Opened $1 Billion in Meta, Nvidia and Microsoft Stakes | What UBS Sees in Meta (META) Amid Heavy AI Spending | Chip stocks lead tech lower, Anthropic stock drops: AlphaCheck
+- Headlines: Jensen Huang back at Nvidia, stock soars; Anthropic slides | How Taylor Sheridan still makes a profit from high-budget TV | All Broadcom Has to Do is Deliver Modestly to Prove Stanley Druckenmiller Wrong and Hit $500 in 2027 | Nebius Keeps Plummeting Amid 50% Drop This Month: This Wall Street Pro Now Predicts 370% Returns After Slight Adjustment | Meta Soars 6%, Cipher Up 17% as AI Stocks Rebound With Jensen Huang Back at Nvidia
 
 ### 5802.T — research score 71.67 / technical score 35.0
 
@@ -84,7 +69,18 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Can Microsoft catch up in the frontier AI race? | Billionaire Dan Loeb Exited Amazon and Opened $1 Billion in Meta, Nvidia and Microsoft Stakes | 5 Potential Multibagger Stocks to Research for Long-Term Growth | Anthropic Stock Slides as Tech Rout Intensifies | Anthropic IPO: Here's What Its Spending Commitments Mean to Microsoft, SpaceX, Amazon, and Alphabet
+- Headlines: Billionaire Ray Dalio Is Going All-In on These 10 AI and Chip Stocks: Should You Buy? | Here’s What Drove Microsoft Corporation’s (MSFT) Q3 Outperformance | Nvidia's Forecast Needs $1.4 Trillion Of AI Spending In 2027. Who Pays? | Microsoft Stocks Rise 3.9% With a Perfect GF Score as OpenAI Contingency Plans Surface | Nebius Keeps Plummeting Amid 50% Drop This Month: This Wall Street Pro Now Predicts 370% Returns After Slight Adjustment
+
+### AVGO — research score 68.75 / technical score 45.0
+
+- Company: Broadcom Inc.
+- Sector / industry: Technology / Semiconductors
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk
+- Headlines: Jensen Huang back at Nvidia, stock soars; Anthropic slides | Jensen Huang back as Nvidia CEO after 12 days: Shares surge 30% | Nvidia soars 30% as board reinstates Jensen Huang as CEO, chip stocks jump | Billionaire Ray Dalio Is Going All-In on These 10 AI and Chip Stocks: Should You Buy? | Alphabet Stocks Jump 6.97% as AI Rebound Spotlights Google Cloud's 103% Growth
 
 ### 6525.T — research score 67.88 / technical score 31.5
 
@@ -101,7 +97,7 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### AAPL — research score 67.0 / technical score 78.0
+### AAPL — research score 67.75 / technical score 81.0
 
 - Company: Apple Inc.
 - Sector / industry: Technology / Consumer Electronics
@@ -110,29 +106,33 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Apple's AI agent push: Why the pressure is mounting | Apple Stock Polishes Breakout As Nvidia-Led AI Boom Gets Wake-Up Call | Is Dolby Laboratories (DLB) Still A Bargain After Strong Results? | Stocks to Watch: Anthropic,  Nvidia, AMD | 3 Tech Dividend Stocks Retirees Shouldn’t Overlook
+- Headlines: Jensen Huang back at Nvidia, stock soars; Anthropic slides | Jensen Huang back as Nvidia CEO after 12 days: Shares surge 30% | Nvidia's Forecast Needs $1.4 Trillion Of AI Spending In 2027. Who Pays? | Nvidia reinstates Jensen Huang as CEO amid pressure from Trump, investors | Nvidia Is Now Second To Apple In The World’s Most Valued Companies On Jensen Huang Optimism
 
-### AVGO — research score 66.67 / technical score 45.0
+### NVDA — research score 67.67 / technical score 34.0
 
-- Company: Broadcom Inc.
+- Company: NVIDIA Corporation
 - Sector / industry: Technology / Semiconductors
 - Growth score: 100.0
 - Quality score: 93.33333333333333
-- Valuation heuristic: 28.333333333333332
+- Valuation heuristic: 43.333333333333336
 - Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Nvidia stock extends 6-day losing streak, as AMD, Broadcom lead chip sector lower | AI trade stocks hit hardest after Jensen Huang’s exit from Nvidia | Why Redburn Downgraded Broadcom (AVGO) Despite 221% AI Growth | Here Are the AI Stocks Tanking This Morning | Anthropic Sinks 9% on Day Two as AI Selloff Deepens: Strategist Warns Against “Chasing the IPO”
+- Risk notes: Technical trend score is weak
+- Headlines: Wall Street analysts cheer Jensen Huang's return to Nvidia — but they still have concerns | Jensen Huang is back atop Nvidia. He has a long road ahead in Washington. | Bitcoin bottoms on 4-year anniversary of FTX low: Nvidia rips 30% | Will Jensen Huang return to Nvidia humbled, or just look the part? | Nvidia's 30% rally: What does it mean for bitcoin?
 
-### 6701.T — research score 66.29 / technical score 43.5
+**Optional local-model review**
 
-- Company: NEC CORP
-- Sector / industry: Technology / Information Technology Services
-- Growth score: 70.0
-- Quality score: 73.33333333333333
-- Valuation heuristic: 78.33333333333333
+skipped: max_llm_symbols limit
+
+### 6857.T — research score 66.0 / technical score 34.0
+
+- Company: ADVANTEST CORP
+- Sector / industry: Technology / Semiconductor Equipment & Materials
+- Growth score: 100.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
 - Data status: ok
-- Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Qualcomm CEO Cristiano Amon on fueling the AI boom | Qualcomm CEO on SpaceX deal: 'It's a great partnership' that will drive 'innovation' | NEC (TSE:6701) Stock May Be 13% Above Fair Value On Cash Flow | NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand
+- Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
+- Headlines: Advantest Stocks Plunge 10.32% to Lead Nikkei Rout Despite Raised AI Forecast | Taiwan Stock Market Falls 6.2% to Cap Its Worst Week Since 1991 as KOSPI Closes Down 5.2% and Nikkei 225 Drops 5.1% in AI Chip Selloff | Nikkei 225 Falls 4.5% and SoftBank Plunges 15% as Wall Street’s AI Selloff Puts Asian Stocks on Track for Their Worst Week Since 2020 | Advantest Stocks Rise 4.56% in Tokyo as Nvidia's Outlook Lifts Chip Testers | Advantest Stocks Tumble 11.12% as Tokyo Chip Selloff Drags Nikkei Below 60,00
 
 **Optional local-model review**
 
