@@ -34,7 +34,7 @@ skipped: max_llm_symbols limit
 
 skipped: max_llm_symbols limit
 
-### META — research score 72.96 / technical score 48.5
+### META — research score 73.71 / technical score 51.5
 
 - Company: Meta Platforms, Inc.
 - Sector / industry: Communication Services / Internet Content & Information
@@ -43,7 +43,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 60.0
 - Data status: ok
 - Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Jensen Huang back at Nvidia, stock soars; Anthropic slides | How Taylor Sheridan still makes a profit from high-budget TV | All Broadcom Has to Do is Deliver Modestly to Prove Stanley Druckenmiller Wrong and Hit $500 in 2027 | Nebius Keeps Plummeting Amid 50% Drop This Month: This Wall Street Pro Now Predicts 370% Returns After Slight Adjustment | Meta Soars 6%, Cipher Up 17% as AI Stocks Rebound With Jensen Huang Back at Nvidia
+- Headlines: Stocks give back gains as Anthropic dips below IPO price | City watchdog threatens tech giants over rogue AI bots | UK financial watchdog delivers AI warning as Meta launches adapted Muse | Why Did Alphabet Stock Move? | AMD Stocks Fall 9.08% After Filing Registers 337 Million Shares for Resale
 
 ### 5802.T — research score 71.67 / technical score 35.0
 
@@ -54,7 +54,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 88.33333333333333
 - Data status: ok
 - Risk notes: Technical trend score is weak
-- Headlines: European Stock Indexes Mixed at Start of Crucial Week | Sumitomo Electric Industries Stock Gets A Lift From Raised Outlook | Japan Joins the Data Center Rush. These Stocks Can Benefit. | Sumitomo Electric Industries (TSE:5802) Stock Looks Cheap Based On Cash Flow | Sumitomo Electric Industries Ltd's Dividend Analysis
+- Headlines: Sumitomo Electric Stocks Rise 5.99% After Raising Its Full-Year Profit Forecast | European Stock Indexes Mixed at Start of Crucial Week | Sumitomo Electric Industries Stock Gets A Lift From Raised Outlook | Japan Joins the Data Center Rush. These Stocks Can Benefit. | Sumitomo Electric Industries (TSE:5802) Stock Looks Cheap Based On Cash Flow
 
 **Optional local-model review**
 
@@ -69,7 +69,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Billionaire Ray Dalio Is Going All-In on These 10 AI and Chip Stocks: Should You Buy? | Here’s What Drove Microsoft Corporation’s (MSFT) Q3 Outperformance | Nvidia's Forecast Needs $1.4 Trillion Of AI Spending In 2027. Who Pays? | Microsoft Stocks Rise 3.9% With a Perfect GF Score as OpenAI Contingency Plans Surface | Nebius Keeps Plummeting Amid 50% Drop This Month: This Wall Street Pro Now Predicts 370% Returns After Slight Adjustment
+- Headlines: Who is holding Jensen Huang accountable? It sure looks like nobody | Why Is Snowflake Stock Going Up? | Why Did Alphabet Stock Move? | Nike's Sales Are Forecast To Fall 8%. Will It Cut AI Spending In 2027? | Microsoft Corporation (MSFT) Is Facing AI Spending Fears: Could Its Cloud Growth Change the Narrative?
 
 ### AVGO — research score 68.75 / technical score 45.0
 
@@ -80,7 +80,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Jensen Huang back at Nvidia, stock soars; Anthropic slides | Jensen Huang back as Nvidia CEO after 12 days: Shares surge 30% | Nvidia soars 30% as board reinstates Jensen Huang as CEO, chip stocks jump | Billionaire Ray Dalio Is Going All-In on These 10 AI and Chip Stocks: Should You Buy? | Alphabet Stocks Jump 6.97% as AI Rebound Spotlights Google Cloud's 103% Growth
+- Headlines: Nvidia, AMD, Broadcom lead chip stocks lower as AI trade comes under pressure | Stocks give back gains as Anthropic dips below IPO price | Stock market today: Dow gains, S&P 500 and Nasdaq decline as chip stocks tumble, investors test AI appetite | Dell Reports Today. Here’s How Much of Your Tech ETF Is Riding on Its AI Server Business | Nvidia, AMD and Micron Lead AI Selloff as Chip Stocks Slide
 
 ### 6525.T — research score 67.88 / technical score 31.5
 
@@ -106,7 +106,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Jensen Huang back at Nvidia, stock soars; Anthropic slides | Jensen Huang back as Nvidia CEO after 12 days: Shares surge 30% | Nvidia's Forecast Needs $1.4 Trillion Of AI Spending In 2027. Who Pays? | Nvidia reinstates Jensen Huang as CEO amid pressure from Trump, investors | Nvidia Is Now Second To Apple In The World’s Most Valued Companies On Jensen Huang Optimism
+- Headlines: Stocks give back gains as Anthropic dips below IPO price | Who is holding Jensen Huang accountable? It sure looks like nobody | Jensen Huang's return revives an old Wall Street trade: Bet on the comeback CEO | Why Did Alphabet Stock Move? | Apple Stock Has 3 Things Going for It in 2027. Here’s My Price Target
 
 ### NVDA — research score 67.67 / technical score 34.0
 
@@ -117,7 +117,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 43.333333333333336
 - Data status: ok
 - Risk notes: Technical trend score is weak
-- Headlines: Wall Street analysts cheer Jensen Huang's return to Nvidia — but they still have concerns | Jensen Huang is back atop Nvidia. He has a long road ahead in Washington. | Bitcoin bottoms on 4-year anniversary of FTX low: Nvidia rips 30% | Will Jensen Huang return to Nvidia humbled, or just look the part? | Nvidia's 30% rally: What does it mean for bitcoin?
+- Headlines: Wall Street's 2027 earnings hopes may be dead on arrival unless the Fed blinks in December | Huang faces 3 camps of GOP skeptics ahead of congressional grilling | Stocks give back gains as Anthropic dips below IPO price | Who is holding Jensen Huang accountable? It sure looks like nobody | What social media is saying about Jensen Huang's Nvidia comeback
 
 **Optional local-model review**
 
@@ -132,7 +132,7 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
-- Headlines: Advantest Stocks Plunge 10.32% to Lead Nikkei Rout Despite Raised AI Forecast | Taiwan Stock Market Falls 6.2% to Cap Its Worst Week Since 1991 as KOSPI Closes Down 5.2% and Nikkei 225 Drops 5.1% in AI Chip Selloff | Nikkei 225 Falls 4.5% and SoftBank Plunges 15% as Wall Street’s AI Selloff Puts Asian Stocks on Track for Their Worst Week Since 2020 | Advantest Stocks Rise 4.56% in Tokyo as Nvidia's Outlook Lifts Chip Testers | Advantest Stocks Tumble 11.12% as Tokyo Chip Selloff Drags Nikkei Below 60,00
+- Headlines: Advantest Stocks Jump 12.45% as Tokyo Chip Testers Lead Huang Rebound | FORM Benefits From Rising Industry Usage of HBM: What's Ahead? | Asia chipmaking stocks soar tracking Nvidia rally; S.Korea, Taiwan lead | Advantest Stocks Plunge 10.32% to Lead Nikkei Rout Despite Raised AI Forecast | Taiwan Stock Market Falls 6.2% to Cap Its Worst Week Since 1991 as KOSPI Closes Down 5.2% and Nikkei 225 Drops 5.1% in AI Chip Selloff
 
 **Optional local-model review**
 
