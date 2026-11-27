@@ -4,6 +4,17 @@
 
 ## Highest research scores
 
+### META — research score 78.08 / technical score 69.0
+
+- Company: Meta Platforms, Inc.
+- Sector / industry: Communication Services / Internet Content & Information
+- Growth score: 90.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 60.0
+- Data status: ok
+- Risk notes: No automatic red flag from available fields; primary-source verification still required
+- Headlines: Amazon.com (AMZN) Is Negotiating Muse AI Access To Its Shopping Platform | Anthropic Stock Jumps to Reveal Its True Place in the AI Trade | Meta Disrupts AI-Driven Commerce | Anthropic, Meta and Microsoft Join AI Data Center Talks in Japan | JPMorgan Flags Major Turning Point for AI Stocks
+
 ### 285A.T — research score 74.12 / technical score 31.5
 
 - Company: KIOXIA HOLDINGS CORPORATION
@@ -13,22 +24,11 @@
 - Valuation heuristic: 71.66666666666667
 - Data status: ok
 - Risk notes: Technical trend score is weak
-- Headlines: Global markets rebound as tech shares recover and tariff fears ease | Kioxia jumps 14% after Nvidia collaboration as chip stocks rebound | SanDisk Trades at 4.6x Earnings—And Still Got Cut in Half | Kioxia Stocks Jump 9.95% as Memory Names Rebound After Huang's Return | Kioxia Stocks Plunge 11.66% as Flash Memory Boom Meets Flat Next-Quarter Guide
+- Headlines: Kioxia Stock Has Soared 21% in Two Days After an Nvidia SSD Test | Global markets rebound as tech shares recover and tariff fears ease | Kioxia jumps 14% after Nvidia collaboration as chip stocks rebound | SanDisk Trades at 4.6x Earnings—And Still Got Cut in Half | Kioxia Stocks Jump 9.95% as Memory Names Rebound After Huang's Return
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
-
-### META — research score 73.71 / technical score 51.5
-
-- Company: Meta Platforms, Inc.
-- Sector / industry: Communication Services / Internet Content & Information
-- Growth score: 90.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 60.0
-- Data status: ok
-- Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Meta Platforms’ (META) Surging Capex Pressures Free Cash Flow Amid Monetization Debates | CoreWeave Seeks $4.5 Billion Meta-Backed Loan as Bond Yields Hit 18% | Meta Platforms Just Partnered With Walmart. Here's Why Investors Should Pay Attention | CoreWeave Can Now Borrow at 7% With Meta’s Name on the Loan | CoreWeave Has the Backlog Lead, Nebius Has the Leverage Edge: Who Wins the Next $100B?
 
 ### 5803.T — research score 73.08 / technical score 34.0
 
@@ -69,11 +69,33 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 51.666666666666664
 - Data status: ok
 - Risk notes: Technical trend score is weak
-- Headlines: Will Jensen Huang's second act as Nvidia CEO be different? | Jensen Huang 'absolutely could be fired again,' legal expert says | 5 things I'm thankful for in AI | Did Arm CEO Rene Haas Dodge a Bullet With Jensen Huang’s Reinstatement at Nvidia? | Dow Jones Futures Rise With U.S. Markets Shut; Look For This Bullish Signal
+- Headlines: Why this portfolio manager says investors should 'avoid the neoclouds' | PacSun CEO talks brand resurgence, holiday shopping season boom | Can AI earn a spot in the creative world? Ja Rule think so. | All these Nvidia headlines are just noise: Why you should keep watching AI spending | Stocks snap from a $6 trillion washout to a $3 trillion surge as Nvidia, Micron, and SpaceX bounce back
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
+
+### 6701.T — research score 68.54 / technical score 52.5
+
+- Company: NEC CORP
+- Sector / industry: Technology / Information Technology Services
+- Growth score: 70.0
+- Quality score: 73.33333333333333
+- Valuation heuristic: 78.33333333333333
+- Data status: ok
+- Risk notes: No automatic red flag from available fields; primary-source verification still required
+- Headlines: Qualcomm CEO Cristiano Amon on fueling the AI boom | Qualcomm CEO on SpaceX deal: 'It's a great partnership' that will drive 'innovation' | NEC (TSE:6701) Stock May Be 13% Above Fair Value On Cash Flow | NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand
+
+### AAPL — research score 68.38 / technical score 83.5
+
+- Company: Apple Inc.
+- Sector / industry: Technology / Consumer Electronics
+- Growth score: 60.0
+- Quality score: 93.33333333333333
+- Valuation heuristic: 36.666666666666664
+- Data status: ok
+- Risk notes: Valuation heuristic flags elevated valuation risk
+- Headlines: Apple gains smartphone share as memory crunch squeezes budget Android phones | Qualcomm Is Betting Big on a $5 Billion Opportunity. Here’s What It Could Mean for the Stock | Is Walmart Stock Priced Like 1999 Again? | SoFi’s 500-Stock ETF Doesn’t Weight Strictly by Size. SFY Tilts America’s Biggest Companies Toward Growth | The Nasdaq Needs Two Huge Days to Dodge Its Worst November Since 2008
 
 ### 6525.T — research score 67.88 / technical score 31.5
 
@@ -99,20 +121,13 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: Oracle Stock Dipped Under $100 as Banks Try to Unload Its Data-Center Loans | Which Funds With Software Exposure Fit Rising US AI Spending? | The Economy Grew Way Faster Than First Reported: Q3 GDP Revised Up to 4.3% | Netflix vs. Apple: Which Streaming Stock Has an Edge Right Now? | Michael Burry Makes Surprising Pivot on Stock Market
+- Headlines: ServiceNow vs. Synopsys: Which Technology Stock Is a Better Buy for 2027? | Anthropic Just Hit an $81 Billion Run Rate—Why Wall Street’s Post-IPO Jitters Are a Gift | SoFi’s 500-Stock ETF Doesn’t Weight Strictly by Size. SFY Tilts America’s Biggest Companies Toward Growth | Why Is Microsoft (MSFT) Down 7.6% Since Last Earnings Report? | What you should expect from the November jobs report
 
-### AAPL — research score 67.75 / technical score 81.0
+**Optional local-model review**
 
-- Company: Apple Inc.
-- Sector / industry: Technology / Consumer Electronics
-- Growth score: 60.0
-- Quality score: 93.33333333333333
-- Valuation heuristic: 36.666666666666664
-- Data status: ok
-- Risk notes: Valuation heuristic flags elevated valuation risk
-- Headlines: The Economy Grew Way Faster Than First Reported: Q3 GDP Revised Up to 4.3% | Can VZ's New Apple Deals and Loyalty Benefits Drive Subscriber Growth? | If You Invest $1,000 in Apple Today, Here’s What It Could Be Worth by 2029 | Michael Burry exits Nasdaq-100 short | Netflix vs. Apple: Which Streaming Stock Has an Edge Right Now?
+skipped: max_llm_symbols limit
 
-### AVGO — research score 66.88 / technical score 37.5
+### AVGO — research score 67.0 / technical score 38.0
 
 - Company: Broadcom Inc.
 - Sector / industry: Technology / Semiconductors
@@ -121,22 +136,11 @@ skipped: max_llm_symbols limit
 - Valuation heuristic: 36.666666666666664
 - Data status: ok
 - Risk notes: Valuation heuristic flags elevated valuation risk; Technical trend score is weak
-- Headlines: NVIDIA Just Dropped 31% in a Month. Will NVDA Stock Hit $125 or $200 First? | S&P’s NVIDIA Warning is Backward Looking Governance Theater That Gives Everyone an Opportunity to Buy at $150 | Marvell Reports Tuesday. How Often Has It Dropped 10%? | What's Happening To Marvell's Cash Gap With Broadcom | Credo Technology Ahead of Q2 Earnings: How to Approach the Stock Now?
+- Headlines: Qualcomm Is Betting Big on a $5 Billion Opportunity. Here’s What It Could Mean for the Stock | SEALSQ (LAES) Stock Is Up 22.0% Today Without Company News | Jensen Huang Said Nvidia’s Blackwell Chips Were Too Big to Smuggle. Bloomberg Just Found Them in China. | Prediction: Broadcom Stock Could Have Another Big Year as AI Chip Revenue Accelerates | 10 Best Strong Buy Stocks to Buy and Hold For the Next 5 Years
 
 **Optional local-model review**
 
 skipped: max_llm_symbols limit
-
-### 6701.T — research score 66.29 / technical score 43.5
-
-- Company: NEC CORP
-- Sector / industry: Technology / Information Technology Services
-- Growth score: 70.0
-- Quality score: 73.33333333333333
-- Valuation heuristic: 78.33333333333333
-- Data status: ok
-- Risk notes: No automatic red flag from available fields; primary-source verification still required
-- Headlines: Qualcomm CEO Cristiano Amon on fueling the AI boom | Qualcomm CEO on SpaceX deal: 'It's a great partnership' that will drive 'innovation' | NEC (TSE:6701) Stock May Be 13% Above Fair Value On Cash Flow | NEC (TSE:6701) Stock Price Cools As Q2 Earnings Raise Stakes | Japanese cybersecurity stocks rally as PHP flaw spurs demand
 
 ## Method and limitations
 
